@@ -1,630 +1,1101 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kerala MLA Scorecard - 15th Assembly (2021-2026)</title>
-    <link href="https://unpkg.com/tabulator-tables@5.5.0/dist/css/tabulator_midnight.min.css" rel="stylesheet">
-    <script src="https://unpkg.com/tabulator-tables@5.5.0/dist/js/tabulator.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <style>
-        :root {
-            --bg-primary: #0c0a06;
-            --bg-secondary: #1a1608;
-            --bg-card: #231e0f;
-            --text-primary: #f5f0e0;
-            --text-secondary: #b0a880;
-            --accent: #d4a017;
-            --accent-light: #f0c040;
-            --accent-glow: #ffd74a;
-            --green: #4caf50;
-            --yellow: #f0c040;
-            --orange: #e67e22;
-            --red: #e74c3c;
-            --border: #3d3518;
-            --gold-gradient: linear-gradient(135deg, #d4a017, #f0c040, #d4a017);
-        }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Kerala MLA Performance Scorecard — 15th Assembly</title>
+<meta name="theme-color" content="#000000">
+<meta name="color-scheme" content="light">
+<meta name="description" content="IPU-aligned performance scorecard for 140 MLAs of the 15th Kerala Legislative Assembly (2021-2026). Participation, Accountability, Legislative Initiative, Probity.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@200;300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://unpkg.com/tabulator-tables@5.5.0/dist/css/tabulator_simple.min.css" rel="stylesheet">
+<script src="https://unpkg.com/tabulator-tables@5.5.0/dist/js/tabulator.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg: #FFFFFF;
+  --bg-soft: #FAFAF5;
+  --ink: #000000;
+  --ink-1: #1A1A1A;
+  --ink-2: #5A5A5A;
+  --ink-3: #B0B0B0;
+  --line: rgba(0, 0, 0, 0.08);
+  --line-2: rgba(0, 0, 0, 0.14);
+  --accent: #F5E003;
+  --accent-deep: #000000;
+  --accent-soft: #FEFAC4;
+  --green: #1E8449;
+  --red: #B03A2E;
+  --sans: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease: cubic-bezier(0.65, 0, 0.35, 1);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; overflow-x: hidden; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--sans); font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  opacity: 0; transition: opacity 0.5s ease;
+}
+body.loaded { opacity: 1; }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+/* Loading */
+.loader-overlay {
+  position: fixed; inset: 0; z-index: 9999;
+  background: #000; display: flex;
+  align-items: center; justify-content: center;
+  transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+.loader-overlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+.loader-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--accent); margin: 0 6px;
+  animation: loaderPulse 1.2s ease-in-out infinite;
+}
+.loader-dot:nth-child(2) { animation-delay: 0.15s; }
+.loader-dot:nth-child(3) { animation-delay: 0.3s; }
+@keyframes loaderPulse {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40% { transform: scale(1); opacity: 1; }
+}
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.6;
-        }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  .rv { opacity: 1 !important; transform: none !important; }
+}
 
-        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+.hl-mark {
+  font-style: italic; font-weight: 500; color: var(--ink);
+  background: linear-gradient(transparent 62%, var(--accent) 62%, var(--accent) 94%, transparent 94%);
+  padding: 0 6px;
+  -webkit-box-decoration-break: clone; box-decoration-break: clone;
+}
 
-        header {
-            text-align: center;
-            padding: 40px 20px;
-            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-card));
-            border-radius: 16px;
-            margin-bottom: 30px;
-            border: 1px solid var(--border);
-            position: relative;
-            overflow: hidden;
-        }
+/* Brand Bar */
+.brand-bar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 40;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 22px 36px; pointer-events: none; mix-blend-mode: difference;
+}
+.brand {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: 1.6px; text-transform: uppercase; color: #FFFFFF;
+}
+.brand-mark {
+  width: 22px; height: 22px;
+  border: 1.5px solid #FFFFFF; border-radius: 50%; position: relative;
+}
+.brand-mark::before {
+  content: ''; position: absolute; inset: 4px;
+  background: #FFFFFF; border-radius: 50%;
+}
+.phase-ticker {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 1.5px; color: #FFFFFF;
+}
+.phase-ticker-label { opacity: 0.5; text-transform: uppercase; margin-right: 8px; }
+.phase-ticker-value {
+  display: inline-block; padding: 3px 10px;
+  border: 1px solid rgba(255,255,255,0.25); border-radius: 3px;
+  text-transform: uppercase;
+}
 
-        header::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 3px;
-            background: var(--gold-gradient);
-        }
+/* Side Rail */
+.rail {
+  position: fixed; right: 22px; top: 50%; transform: translateY(-50%);
+  z-index: 30; display: flex; flex-direction: column; gap: 18px;
+  align-items: flex-end;
+}
+.rail-track { position: absolute; right: 0; top: 0; bottom: 0; width: 1px; background: var(--line-2); }
+.rail-progress {
+  position: absolute; right: 0; top: 0; width: 1px;
+  background: var(--accent); transform-origin: top;
+  transform: scaleY(0); height: 100%;
+}
+.rail-tick {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--ink-3);
+  padding-right: 14px; cursor: pointer;
+  transition: color 0.3s ease; position: relative;
+}
+.rail-tick::after {
+  content: ''; position: absolute;
+  right: -2px; top: 50%; transform: translateY(-50%);
+  width: 5px; height: 5px; border-radius: 50%; background: var(--line-2);
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+.rail-tick.active { color: var(--ink); font-weight: 500; }
+.rail-tick.active::after {
+  background: var(--accent); transform: translateY(-50%) scale(1.6);
+}
 
-        header h1 {
-            font-size: 2.2em;
-            background: var(--gold-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 8px;
-            letter-spacing: 0.5px;
-        }
+/* Scroll Progress */
+.scroll-progress { position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 50; background: var(--line); }
+.scroll-progress-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.1s linear; }
+.scroll-pct {
+  position: fixed; top: 10px; left: 50%; transform: translateX(-50%);
+  font-family: var(--mono); font-size: 10px; letter-spacing: 1px;
+  color: var(--ink-2); opacity: 0; transition: opacity 0.3s ease; z-index: 51;
+}
+.scroll-pct.visible { opacity: 1; }
 
-        header p { color: var(--text-secondary); font-size: 1.1em; }
+section {
+  min-height: 100vh; display: flex; flex-direction: column;
+  justify-content: center; padding: 80px 9vw;
+  position: relative;
+}
+section.auto-height { min-height: auto; }
 
-        .stats-bar {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 16px;
-            margin-bottom: 30px;
-        }
+/* Reveal */
+.rv {
+  opacity: 0; transform: translateY(32px);
+  transition: opacity 0.9s var(--ease-out), transform 0.9s var(--ease-out);
+}
+.rv.in { opacity: 1; transform: translateY(0); }
+.rv.d1 { transition-delay: 0.10s; }
+.rv.d2 { transition-delay: 0.25s; }
+.rv.d3 { transition-delay: 0.40s; }
+.rv.d4 { transition-delay: 0.55s; }
+.rv.d5 { transition-delay: 0.70s; }
+.rv.d6 { transition-delay: 0.85s; }
+.plx { will-change: transform; }
 
-        .stat-card {
-            background: var(--bg-card);
-            border-radius: 12px;
-            padding: 20px;
-            border: 1px solid var(--border);
-            text-align: center;
-        }
+/* Section Eyebrow */
+.eyebrow {
+  font-family: var(--mono); font-size: 11px; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--ink-2);
+  display: flex; align-items: center; gap: 14px; margin-bottom: 28px;
+}
+.eyebrow::before { content: ''; width: 40px; height: 8px; background: var(--accent); }
 
-        .stat-card .value {
-            font-size: 2em;
-            font-weight: 700;
-            color: var(--accent-light);
-        }
+/* Hero */
+.hero { padding-top: 120px; position: relative; }
+.hero h1 {
+  font-size: clamp(42px, 6vw, 80px); font-weight: 300;
+  letter-spacing: -0.03em; line-height: 1.05; margin-bottom: 28px;
+}
+.hero h1 em {
+  font-style: italic; font-weight: 500;
+  background: linear-gradient(transparent 60%, var(--accent) 60%, var(--accent) 92%, transparent 92%);
+  -webkit-box-decoration-break: clone; box-decoration-break: clone;
+}
+.hero-sub {
+  font-size: 18px; line-height: 1.6; color: var(--ink-1);
+  max-width: 52ch; margin-bottom: 48px;
+}
+.hero-year-ghost {
+  position: absolute; top: 50%; right: 6vw;
+  transform: translateY(-50%);
+  font-size: clamp(120px, 18vw, 240px); font-weight: 200;
+  color: var(--line); letter-spacing: -0.04em;
+  pointer-events: none; user-select: none; z-index: -1;
+}
+.scroll-hint {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--mono); font-size: 10px; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--ink-3);
+}
+.scroll-hint-line {
+  width: 1px; height: 48px; background: var(--line-2);
+  position: relative; overflow: hidden;
+}
+.scroll-hint-line::after {
+  content: ''; position: absolute; inset: 0;
+  background: var(--accent); animation: trickle 2.5s ease-in-out infinite;
+}
+@keyframes trickle { 0% { transform: translateY(-100%); } 60%, 100% { transform: translateY(100%); } }
 
-        .stat-card .label {
-            color: var(--text-secondary);
-            font-size: 0.9em;
-            margin-top: 4px;
-        }
+/* Metric Cards */
+.metrics-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 24px; width: 100%; margin-top: 40px;
+}
+.metric-card {
+  padding: 32px 28px; border: 1px solid var(--line-2);
+  background: var(--bg); transition: all 0.3s var(--ease-out);
+}
+.metric-card:hover { border-color: var(--ink); background: var(--accent-soft); }
+.metric-card.highlight { border: 2px solid var(--ink); background: var(--accent); }
+.metric-val {
+  font-size: 36px; font-weight: 600; letter-spacing: -0.02em;
+  margin-bottom: 8px; line-height: 1;
+}
+.metric-val.lg { font-size: 44px; }
+.metric-label {
+  font-family: var(--mono); font-size: 11px; letter-spacing: 1.4px;
+  text-transform: uppercase; color: var(--ink-2); line-height: 1.5;
+}
+.metric-sub { font-size: 13px; color: var(--ink-2); margin-top: 8px; line-height: 1.4; }
 
-        .filters {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
+/* Weight Cards */
+.weight-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px;
+  width: 100%; margin-top: 40px;
+}
+.weight-card {
+  padding: 28px 16px; text-align: center;
+  border: 1px solid var(--line-2); position: relative;
+  transition: all 0.3s var(--ease-out);
+}
+.weight-card:hover { background: var(--accent-soft); border-color: var(--ink); }
+.weight-card-pct {
+  font-size: 32px; font-weight: 600; margin-bottom: 8px; letter-spacing: -0.02em;
+}
+.weight-card-name { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+.weight-card-desc { font-size: 11px; color: var(--ink-2); line-height: 1.5; }
+.weight-card.primary { background: var(--accent); border: 2px solid var(--ink); }
 
-        .filters select, .filters input {
-            background: var(--bg-card);
-            color: var(--text-primary);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 10px 14px;
-            font-size: 0.95em;
-            outline: none;
-        }
+/* Pipeline */
+.pipeline-wrap {
+  display: flex; align-items: stretch; width: 100%; margin-top: 40px;
+  height: 56px; border-radius: 4px; overflow: hidden;
+  border: 1px solid var(--line-2);
+}
+.pipeline-seg {
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.5px;
+  padding: 0 16px; white-space: nowrap; transition: all 0.3s ease;
+}
+.pipeline-seg.s1 { background: var(--ink); color: var(--accent); flex: 3; }
+.pipeline-seg.s2 { background: var(--accent); color: var(--ink); flex: 2; }
+.pipeline-seg.s3 { background: var(--bg-soft); color: var(--ink-1); flex: 1.5; border-right: 1px solid var(--line-2); }
+.pipeline-seg.s4 { background: var(--bg); color: var(--ink-1); flex: 1.5; }
 
-        .filters select:focus, .filters input:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 8px rgba(212, 160, 23, 0.3);
-        }
+/* Dark section */
+.dark-section { background: var(--ink); color: #FFFFFF; }
+.dark-section .eyebrow { color: rgba(255,255,255,0.5); }
+.dark-section .eyebrow::before { background: var(--accent); }
+.dark-section h2 {
+  font-size: clamp(28px, 3.2vw, 44px); font-weight: 400;
+  letter-spacing: -0.02em; line-height: 1.1;
+  max-width: 30ch; margin-bottom: 20px; color: #FFFFFF;
+}
+.dark-section h2 em { color: var(--accent); font-style: italic; font-weight: 500; background: none; }
+.dark-section p { color: rgba(255,255,255,0.7); }
+.dark-section .metric-card {
+  border-color: rgba(255,255,255,0.15); background: rgba(255,255,255,0.04);
+}
+.dark-section .metric-card:hover { background: rgba(255,255,255,0.08); border-color: var(--accent); }
+.dark-section .metric-card.highlight { background: var(--accent); border-color: var(--accent); color: var(--ink); }
+.dark-section .metric-card.highlight .metric-label { color: var(--ink-1); }
+.dark-section .metric-val { color: #FFFFFF; }
+.dark-section .metric-card.highlight .metric-val { color: var(--ink); }
+.dark-section .metric-label { color: rgba(255,255,255,0.5); }
 
-        .section-title {
-            font-size: 1.4em;
-            margin: 30px 0 15px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid var(--accent);
-            display: inline-block;
-            color: var(--accent-light);
-        }
+/* Filters */
+.filter-bar {
+  display: flex; gap: 12px; width: 100%; margin-top: 32px; flex-wrap: wrap;
+}
+.filter-bar input, .filter-bar select {
+  font-family: var(--sans); font-size: 14px; padding: 10px 16px;
+  border: 1px solid var(--line-2); background: var(--bg);
+  color: var(--ink); outline: none; transition: border-color 0.2s ease;
+}
+.filter-bar input:focus, .filter-bar select:focus { border-color: var(--ink); }
+.filter-bar input { flex: 1; min-width: 200px; }
+.filter-bar select { min-width: 140px; cursor: pointer; }
 
-        .charts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
+/* Tabulator Overrides */
+.tabulator {
+  border: 1px solid var(--line-2) !important;
+  background: var(--bg) !important;
+  font-family: var(--sans) !important;
+  font-size: 13px !important;
+}
+.tabulator .tabulator-header {
+  background: var(--ink) !important;
+  border-bottom: 2px solid var(--ink) !important;
+}
+.tabulator .tabulator-header .tabulator-col {
+  background: var(--ink) !important;
+  border-right: 1px solid rgba(255,255,255,0.1) !important;
+}
+.tabulator .tabulator-header .tabulator-col-content {
+  padding: 12px 14px !important;
+}
+.tabulator .tabulator-header .tabulator-col .tabulator-col-title {
+  color: var(--accent) !important;
+  font-family: var(--mono) !important;
+  font-size: 10px !important;
+  letter-spacing: 1.2px !important;
+  text-transform: uppercase !important;
+  font-weight: 500 !important;
+}
+.tabulator .tabulator-tableholder .tabulator-table .tabulator-row {
+  background: var(--bg) !important;
+  border-bottom: 1px solid var(--line) !important;
+  color: var(--ink-1) !important;
+}
+.tabulator .tabulator-tableholder .tabulator-table .tabulator-row:hover {
+  background: var(--accent-soft) !important;
+}
+.tabulator .tabulator-tableholder .tabulator-table .tabulator-row .tabulator-cell {
+  border-right: 1px solid var(--line) !important;
+  padding: 10px 14px !important;
+}
+.tabulator .tabulator-footer {
+  background: var(--bg-soft) !important;
+  border-top: 1px solid var(--line-2) !important;
+  color: var(--ink-2) !important;
+}
+.tabulator .tabulator-footer .tabulator-page {
+  color: var(--ink-2) !important;
+  border: 1px solid var(--line-2) !important;
+  background: var(--bg) !important;
+}
+.tabulator .tabulator-footer .tabulator-page.active {
+  background: var(--ink) !important;
+  color: var(--accent) !important;
+  border-color: var(--ink) !important;
+}
 
-        .chart-card {
-            background: var(--bg-card);
-            border-radius: 12px;
-            padding: 20px;
-            border: 1px solid var(--border);
-        }
+/* Score bar in table */
+.score-bar-wrap { display: flex; align-items: center; gap: 8px; }
+.score-track { flex: 1; height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
+.score-fill { height: 100%; border-radius: 3px; transition: width 0.5s var(--ease-out); }
+.score-num { min-width: 32px; text-align: right; font-family: var(--mono); font-size: 12px; font-weight: 500; }
 
-        .chart-card h3 {
-            margin-bottom: 15px;
-            color: var(--accent-light);
-            font-size: 1em;
-        }
+/* Grade badge */
+.grade-badge {
+  display: inline-block; padding: 3px 10px; border-radius: 2px;
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.8px;
+  font-weight: 600; text-transform: uppercase;
+}
+.grade-A-plus { background: var(--accent); color: var(--ink); }
+.grade-A { background: #D5F5E3; color: #1E8449; }
+.grade-B-plus { background: #D4EFDF; color: #27AE60; }
+.grade-B { background: #FDEBD0; color: #B9770E; }
+.grade-C { background: #FADBD8; color: #B03A2E; }
+.grade-D { background: #F2D7D5; color: #943126; }
 
-        #mla-table { margin-bottom: 30px; }
+/* Party badge */
+.party-badge {
+  display: inline-block; padding: 2px 8px; border-radius: 2px;
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.5px;
+}
 
-        .grade-badge {
-            display: inline-block;
-            padding: 2px 10px;
-            border-radius: 6px;
-            font-weight: 700;
-            font-size: 0.85em;
-        }
+/* Charts grid */
+.charts-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 24px; width: 100%; margin-top: 40px;
+}
+.chart-card {
+  padding: 28px; border: 1px solid var(--line-2);
+  background: var(--bg); transition: all 0.3s var(--ease-out);
+}
+.chart-card:hover { border-color: var(--ink); }
+.chart-card-title {
+  font-family: var(--mono); font-size: 11px; letter-spacing: 1.4px;
+  text-transform: uppercase; color: var(--ink-2); margin-bottom: 20px;
+}
+.chart-card canvas { max-height: 300px; }
 
-        .grade-A-plus { background: var(--accent-glow); color: #000; }
-        .grade-A { background: var(--accent-light); color: #000; }
-        .grade-B-plus { background: var(--green); color: #fff; }
-        .grade-B { background: #66bb6a; color: #000; }
-        .grade-C { background: var(--orange); color: #000; }
-        .grade-D { background: var(--red); color: #fff; }
+/* Method cards */
+.method-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px;
+  width: 100%; margin-top: 40px;
+}
+.method-card {
+  padding: 32px 28px; border: 1px solid var(--line-2);
+  transition: all 0.3s var(--ease-out);
+}
+.method-card:hover { border-color: var(--ink); background: var(--accent-soft); }
+.method-card-title {
+  font-size: 15px; font-weight: 600; margin-bottom: 12px;
+  display: flex; align-items: center; gap: 10px;
+}
+.method-card-title::before {
+  content: ''; width: 8px; height: 8px; background: var(--accent); flex-shrink: 0;
+}
+.method-card-body { font-size: 13px; line-height: 1.65; color: var(--ink-1); }
+.method-card-body .tag {
+  font-family: var(--mono); font-size: 11px;
+  background: var(--bg-soft); padding: 2px 6px; border-radius: 3px;
+}
 
-        .party-badge {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 0.8em;
-            font-weight: 600;
-        }
+/* Close */
+.close-section {
+  min-height: 60vh; align-items: center; justify-content: center;
+  text-align: center; padding-bottom: 100px;
+}
+.close-mark {
+  width: 56px; height: 56px; border-radius: 50%;
+  background: var(--accent); margin: 0 auto 32px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px;
+}
+.close-quote {
+  font-size: clamp(22px, 3vw, 36px); font-weight: 300;
+  letter-spacing: -0.02em; line-height: 1.3; max-width: 38ch;
+}
+.close-quote .hl {
+  font-weight: 500;
+  background: linear-gradient(transparent 62%, var(--accent) 62%, var(--accent) 94%, transparent 94%);
+  -webkit-box-decoration-break: clone; box-decoration-break: clone;
+}
+.close-tag {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--ink-3); margin-top: 32px;
+}
 
-        .score-bar {
-            height: 8px;
-            border-radius: 4px;
-            background: #1a1608;
-            overflow: hidden;
-        }
+/* Framework badges */
+.badges-row {
+  display: flex; gap: 12px; flex-wrap: wrap; margin-top: 32px;
+}
+.fw-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 14px; border: 1px solid var(--line-2);
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: 1px; text-transform: uppercase; color: var(--ink-2);
+  transition: all 0.2s ease;
+}
+.fw-badge:hover { border-color: var(--ink); background: var(--accent-soft); }
+.fw-badge::before { content: ''; width: 6px; height: 6px; background: var(--accent); border-radius: 50%; }
 
-        .score-bar-fill {
-            height: 100%;
-            border-radius: 4px;
-            transition: width 0.3s ease;
-        }
-
-        .minister-note {
-            background: var(--bg-card);
-            border-left: 4px solid var(--accent);
-            padding: 16px 20px;
-            border-radius: 0 8px 8px 0;
-            margin: 20px 0;
-            color: var(--text-secondary);
-            font-size: 0.95em;
-        }
-
-        .methodology {
-            background: var(--bg-card);
-            border-radius: 12px;
-            padding: 24px;
-            margin-top: 40px;
-            border: 1px solid var(--border);
-        }
-
-        .methodology h3 {
-            margin-bottom: 12px;
-            color: var(--accent-light);
-        }
-
-        .methodology p, .methodology li {
-            color: var(--text-secondary);
-            font-size: 0.9em;
-            margin-bottom: 6px;
-        }
-
-        .methodology a { color: var(--accent-light); }
-
-        .framework-badge {
-            display: inline-block;
-            padding: 3px 10px;
-            border: 1px solid var(--accent);
-            border-radius: 12px;
-            font-size: 0.75em;
-            color: var(--accent-light);
-            margin-right: 6px;
-            margin-bottom: 4px;
-        }
-
-        footer {
-            text-align: center;
-            padding: 30px;
-            color: var(--text-secondary);
-            font-size: 0.85em;
-        }
-
-        footer a { color: var(--accent-light); text-decoration: none; }
-
-        /* Override Tabulator theme colors */
-        .tabulator {
-            background-color: var(--bg-secondary) !important;
-            border-color: var(--border) !important;
-        }
-        .tabulator .tabulator-header {
-            background-color: var(--bg-card) !important;
-            border-color: var(--border) !important;
-        }
-        .tabulator .tabulator-header .tabulator-col {
-            background-color: var(--bg-card) !important;
-            border-color: var(--border) !important;
-        }
-        .tabulator-row {
-            border-color: var(--border) !important;
-        }
-        .tabulator-row.tabulator-row-even {
-            background-color: rgba(212, 160, 23, 0.03) !important;
-        }
-
-        @media (max-width: 768px) {
-            .charts-grid { grid-template-columns: 1fr; }
-            header h1 { font-size: 1.5em; }
-        }
-    </style>
+/* Responsive */
+@media (max-width: 900px) {
+  .rail { display: none; }
+  section { padding: 60px 6vw; }
+  .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+  .weight-grid { grid-template-columns: repeat(2, 1fr); }
+  .charts-grid { grid-template-columns: 1fr; }
+  .method-grid { grid-template-columns: 1fr; }
+  .hero h1 { font-size: clamp(36px, 8vw, 56px); }
+  .pipeline-wrap { flex-direction: column; height: auto; }
+  .pipeline-seg { padding: 14px 16px; }
+}
+@media (max-width: 600px) {
+  .metrics-grid { grid-template-columns: 1fr; }
+  .weight-grid { grid-template-columns: 1fr; }
+  .filter-bar { flex-direction: column; }
+}
+</style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Kerala MLA Performance Scorecard</h1>
-            <p>15th Legislative Assembly (2021-2026) &bull; {{ total_mlas }} MLAs &bull; Data as of {{ data_date }}</p>
-            <div style="margin-top:12px;">
-                <span class="framework-badge">IPU Indicators</span>
-                <span class="framework-badge">Sansad Ratna</span>
-                <span class="framework-badge">PRS India</span>
-                <span class="framework-badge">MyNeta ADR</span>
-            </div>
-        </header>
 
-        <div class="stats-bar">
-            <div class="stat-card">
-                <div class="value">{{ total_mlas }}</div>
-                <div class="label">Total MLAs</div>
-            </div>
-            <div class="stat-card">
-                <div class="value">{{ total_scored }}</div>
-                <div class="label">MLAs Scored</div>
-            </div>
-            <div class="stat-card">
-                <div class="value">{{ avg_composite }}</div>
-                <div class="label">Average Score</div>
-            </div>
-            <div class="stat-card">
-                <div class="value">{{ avg_attendance }}%</div>
-                <div class="label">Avg Attendance</div>
-            </div>
-            <div class="stat-card">
-                <div class="value">{{ avg_questions }}</div>
-                <div class="label">Avg Questions</div>
-            </div>
-            <div class="stat-card">
-                <div class="value">{{ ministers_count }}</div>
-                <div class="label">Ministers</div>
-            </div>
-        </div>
+<!-- Loading -->
+<div class="loader-overlay" id="loaderOverlay">
+  <div class="loader-dot"></div>
+  <div class="loader-dot"></div>
+  <div class="loader-dot"></div>
+</div>
 
-        <div class="charts-grid">
-            <div class="chart-card">
-                <h3>Grade Distribution</h3>
-                <canvas id="gradeChart"></canvas>
-            </div>
-            <div class="chart-card">
-                <h3>Party-wise Average Score</h3>
-                <canvas id="partyChart"></canvas>
-            </div>
-            <div class="chart-card">
-                <h3>Attendance vs Questions Asked</h3>
-                <canvas id="scatterChart"></canvas>
-            </div>
-            <div class="chart-card">
-                <h3>Alliance Comparison</h3>
-                <canvas id="allianceChart"></canvas>
-            </div>
-        </div>
+<!-- Scroll Progress -->
+<div class="scroll-progress">
+  <div class="scroll-progress-fill" id="progressFill"></div>
+</div>
+<div class="scroll-pct" id="scrollPct">0%</div>
 
-        <h2 class="section-title">Regular MLAs</h2>
+<!-- Brand Bar -->
+<header class="brand-bar">
+  <div class="brand">
+    <div class="brand-mark"></div>
+    Kerala MLA Scorecard
+  </div>
+  <div class="phase-ticker">
+    <span class="phase-ticker-label">Section</span>
+    <span class="phase-ticker-value" id="phaseTicker">Overview</span>
+  </div>
+</header>
 
-        <div class="filters">
-            <input type="text" id="nameSearch" placeholder="Search MLA name..." />
-            <select id="partyFilter">
-                <option value="">All Parties</option>
-                {% for party in parties %}
-                <option value="{{ party }}">{{ party }}</option>
-                {% endfor %}
-            </select>
-            <select id="allianceFilter">
-                <option value="">All Alliances</option>
-                <option value="LDF">LDF</option>
-                <option value="UDF">UDF</option>
-                <option value="Other">Other</option>
-            </select>
-            <select id="gradeFilter">
-                <option value="">All Grades</option>
-                <option value="A+">A+</option>
-                <option value="A">A</option>
-                <option value="B+">B+</option>
-                <option value="B">B</option>
-                <option value="C">C</option>
-                <option value="D">D</option>
-            </select>
-        </div>
+<!-- Side Rail -->
+<aside class="rail" id="rail">
+  <div class="rail-track"></div>
+  <div class="rail-progress" id="railProgress"></div>
+  <div class="rail-tick" data-section="hero">Overview</div>
+  <div class="rail-tick" data-section="stats">Statistics</div>
+  <div class="rail-tick" data-section="rankings">Rankings</div>
+  <div class="rail-tick" data-section="charts">Analytics</div>
+  <div class="rail-tick" data-section="ministers">Ministers</div>
+  <div class="rail-tick" data-section="methodology">Methodology</div>
+  <div class="rail-tick" data-section="close">Close</div>
+</aside>
 
-        <div id="mla-table"></div>
+<main>
 
-        <h2 class="section-title">Minister Track</h2>
-        <div class="minister-note">
-            Ministers represent the government in the Assembly. They do not sign the attendance register,
-            ask questions, or introduce private member bills. They are scored separately on Probity and
-            Legislative activity only.
-        </div>
-        <div id="minister-table"></div>
+<!-- 1. HERO -->
+<section class="hero" data-section="hero" data-label="Overview">
+  <div class="hero-year-ghost plx">2026</div>
+  <div class="eyebrow rv d1">15th Kerala Legislative Assembly &middot; 2021 &ndash; 2026</div>
+  <h1 class="rv d2">MLA<br><em>Scorecard.</em></h1>
+  <p class="hero-sub rv d3">An IPU-aligned performance scorecard for {{ total_mlas }} MLAs across four dimensions &mdash; Participation, Accountability, Legislative Initiative, and Probity. Data sourced from PRS Legislative Research and MyNeta/ADR election affidavits.</p>
+  <div class="badges-row rv d4">
+    <span class="fw-badge">IPU Indicators</span>
+    <span class="fw-badge">Sansad Ratna</span>
+    <span class="fw-badge">PRS India</span>
+    <span class="fw-badge">MyNeta / ADR</span>
+  </div>
+  <div class="scroll-hint rv d5" style="margin-top:40px;">
+    <span class="scroll-hint-line"></span>
+    <span>Scroll</span>
+  </div>
+</section>
 
-        <div class="methodology">
-            <h3>Scoring Methodology</h3>
-            <p>Based on internationally accepted frameworks:</p>
-            <ul style="padding-left:20px; margin:10px 0;">
-                <li><a href="https://www.parliamentaryindicators.org/">IPU Indicators for Democratic Parliaments</a> (SDG 16.6 &amp; 16.7)</li>
-                <li><a href="https://www.sansadratna.in/">Sansad Ratna Awards</a> criteria</li>
-                <li><a href="https://prsindia.org/mlatrack">PRS Legislative Research</a> MLA Track methodology</li>
-                <li><a href="https://bpac.in/">B.PAC</a> MLA Rating Framework</li>
-            </ul>
-            <p style="margin-top:12px;"><strong>Four scoring dimensions:</strong></p>
-            <ul style="padding-left:20px; margin:10px 0;">
-                <li><strong>Participation (30%)</strong> &mdash; Assembly attendance. IPU Target: Effective + Participatory.</li>
-                <li><strong>Accountability (35%)</strong> &mdash; Questions raised (primary oversight tool). IPU Target: Accountable + Responsive.</li>
-                <li><strong>Legislative Initiative (15%)</strong> &mdash; Private member bills + committee roles. IPU Target: Effective (Lawmaking).</li>
-                <li><strong>Probity (20%)</strong> &mdash; Criminal record from election affidavits. IPU Target: Accountable (Ethics). Education deliberately excluded &mdash; it reflects background, not legislative performance.</li>
-            </ul>
-            <p style="margin-top:12px;">Scores are computed using <strong>percentile ranking</strong> among peers. An MLA at the 80th percentile on a dimension scores 80 on that dimension.</p>
-            <p><strong>Note:</strong> This scorecard measures legislative activity and integrity, not governance impact. An active MLA is not necessarily an effective one, and vice versa.</p>
-        </div>
+<!-- 2. KEY STATISTICS -->
+<section class="dark-section" data-section="stats" data-label="Statistics">
+  <div class="eyebrow rv d1">Assembly Overview</div>
+  <h2 class="rv d2">{{ total_scored }} MLAs scored.<br><em>{{ ministers_count }} on minister track.</em></h2>
+  <p class="rv d3" style="font-size:17px;line-height:1.55;max-width:56ch;margin-bottom:8px;">Ministers are scored separately on Probity and Legislative dimensions only, as attendance and question metrics don't apply to their executive role.</p>
 
-        <footer>
-            <p>
-                Data:
-                <a href="https://prsindia.org/mlatrack?state=Kerala&assembly_term=15">PRS India</a> &bull;
-                <a href="https://www.myneta.info/Kerala2021/">MyNeta (ADR)</a> &bull;
-                <a href="https://niyamasabha.nic.in/">Kerala Legislative Assembly</a>
-            </p>
-            <p style="margin-top:8px;">Generated on {{ generated_date }} &bull; Kerala MLA Scorecard v2.0</p>
-        </footer>
+  <div class="metrics-grid rv d4">
+    <div class="metric-card highlight">
+      <div class="metric-val lg">{{ total_mlas }}</div>
+      <div class="metric-label">Total MLAs</div>
+      <div class="metric-sub">15th Legislative Assembly</div>
     </div>
+    <div class="metric-card">
+      <div class="metric-val">{{ avg_composite }}</div>
+      <div class="metric-label">Avg Composite Score</div>
+      <div class="metric-sub">Regular MLAs (0-100 scale)</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-val">{{ avg_attendance }}%</div>
+      <div class="metric-label">Avg Attendance</div>
+      <div class="metric-sub">Assembly sessions</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-val">{{ avg_questions }}</div>
+      <div class="metric-label">Avg Questions</div>
+      <div class="metric-sub">Starred + unstarred</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-val">{{ ministers_count }}</div>
+      <div class="metric-label">Ministers</div>
+      <div class="metric-sub">Separate scoring track</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-val">{{ total_scored }}</div>
+      <div class="metric-label">MLAs Scored</div>
+      <div class="metric-sub">With composite scores</div>
+    </div>
+  </div>
 
-    <script>
-        const mlaData = {{ mla_data_json | safe }};
-        const ministerData = {{ minister_data_json | safe }};
-        const partyColors = {{ party_colors_json | safe }};
+  <div style="margin-top:40px;font-family:var(--mono);font-size:11px;letter-spacing:1px;color:rgba(255,255,255,0.4);" class="rv d5">
+    Data as of {{ data_date }} &nbsp;|&nbsp; Generated {{ generated_date }}
+  </div>
+</section>
 
-        function getScoreColor(score) {
-            if (score === null || score === undefined) return '#666';
-            if (score >= 80) return '#f0c040';
-            if (score >= 60) return '#4caf50';
-            if (score >= 40) return '#e67e22';
-            return '#e74c3c';
+<!-- 3. SCORING WEIGHTS -->
+<section class="auto-height" data-section="weights" data-label="Weights" style="padding-top:100px;padding-bottom:100px;">
+  <div class="eyebrow rv d1">Scoring Framework</div>
+  <h2 class="rv d2" style="font-size:clamp(28px,3.2vw,44px);font-weight:400;letter-spacing:-0.02em;line-height:1.1;max-width:30ch;margin-bottom:20px;">Four dimensions, one <em class="hl-mark">composite score</em>.</h2>
+  <p class="rv d3" style="font-size:17px;line-height:1.55;color:var(--ink-1);max-width:56ch;">Each MLA is scored on four IPU-aligned dimensions using percentile ranking among non-minister peers. Missing dimensions have their weight dynamically redistributed.</p>
+
+  <div class="weight-grid rv d4">
+    <div class="weight-card">
+      <div class="weight-card-pct">30%</div>
+      <div class="weight-card-name">Participation</div>
+      <div class="weight-card-desc">Assembly attendance &mdash; the most fundamental duty of a legislator</div>
+    </div>
+    <div class="weight-card primary">
+      <div class="weight-card-pct">35%</div>
+      <div class="weight-card-name">Accountability</div>
+      <div class="weight-card-desc">Questions raised &mdash; primary tool for legislative oversight</div>
+    </div>
+    <div class="weight-card">
+      <div class="weight-card-pct">15%</div>
+      <div class="weight-card-name">Legislative</div>
+      <div class="weight-card-desc">Private bills + committee roles &mdash; lawmaking initiative</div>
+    </div>
+    <div class="weight-card">
+      <div class="weight-card-pct">20%</div>
+      <div class="weight-card-name">Probity</div>
+      <div class="weight-card-desc">Criminal record &mdash; fewer cases equals higher score</div>
+    </div>
+  </div>
+
+  <div style="margin-top:48px;" class="rv d5">
+    <div style="font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink-2);margin-bottom:14px;">Data Pipeline</div>
+    <div class="pipeline-wrap">
+      <div class="pipeline-seg s1">Scrape &mdash; PRS + MyNeta</div>
+      <div class="pipeline-seg s2">Merge &mdash; Fuzzy Match</div>
+      <div class="pipeline-seg s3">Score &mdash; Percentile</div>
+      <div class="pipeline-seg s4">Render &mdash; Dashboard</div>
+    </div>
+  </div>
+</section>
+
+<!-- 4. RANKINGS TABLE -->
+<section class="auto-height" data-section="rankings" data-label="Rankings" style="padding-top:100px;padding-bottom:100px;">
+  <div class="eyebrow rv d1">MLA Rankings</div>
+  <h2 class="rv d2" style="font-size:clamp(28px,3.2vw,44px);font-weight:400;letter-spacing:-0.02em;line-height:1.1;max-width:30ch;margin-bottom:20px;">Every legislator, <em class="hl-mark">ranked and scored</em>.</h2>
+  <p class="rv d3" style="font-size:17px;line-height:1.55;color:var(--ink-1);max-width:56ch;margin-bottom:8px;">Sort by any column. Search by name. Filter by party, alliance, or grade. All scores are percentile ranks (0-100) among non-minister peers.</p>
+
+  <div class="filter-bar rv d4">
+    <input type="text" id="nameSearch" placeholder="Search MLA name...">
+    <select id="partyFilter">
+      <option value="">All Parties</option>
+      {% for party in parties %}
+      <option value="{{ party }}">{{ party }}</option>
+      {% endfor %}
+    </select>
+    <select id="allianceFilter">
+      <option value="">All Alliances</option>
+      <option value="LDF">LDF</option>
+      <option value="UDF">UDF</option>
+      <option value="NDA">NDA</option>
+      <option value="Other">Other</option>
+    </select>
+    <select id="gradeFilter">
+      <option value="">All Grades</option>
+      <option value="A+">A+</option>
+      <option value="A">A</option>
+      <option value="B+">B+</option>
+      <option value="B">B</option>
+      <option value="C">C</option>
+      <option value="D">D</option>
+    </select>
+  </div>
+
+  <div id="mla-table" class="rv d5" style="width:100%;margin-top:16px;"></div>
+</section>
+
+<!-- 5. CHARTS & ANALYTICS -->
+<section class="auto-height" data-section="charts" data-label="Analytics" style="padding-top:100px;padding-bottom:100px;">
+  <div class="eyebrow rv d1">Performance Analytics</div>
+  <h2 class="rv d2" style="font-size:clamp(28px,3.2vw,44px);font-weight:400;letter-spacing:-0.02em;line-height:1.1;max-width:30ch;margin-bottom:20px;">Data across <em class="hl-mark">every lens</em>.</h2>
+
+  <div class="charts-grid rv d3">
+    <div class="chart-card">
+      <div class="chart-card-title">Grade Distribution</div>
+      <canvas id="gradeChart"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title">Party-Wise Average Score</div>
+      <canvas id="partyChart"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title">Attendance vs Questions</div>
+      <canvas id="scatterChart"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title">Alliance Comparison &mdash; Radar</div>
+      <canvas id="allianceChart"></canvas>
+    </div>
+  </div>
+</section>
+
+<!-- 6. MINISTERS -->
+<section class="auto-height dark-section" data-section="ministers" data-label="Ministers" style="padding-top:100px;padding-bottom:100px;">
+  <div class="eyebrow rv d1">Minister Track</div>
+  <h2 class="rv d2">Separate scoring for <em>{{ ministers_count }} ministers</em>.</h2>
+  <p class="rv d3" style="font-size:17px;line-height:1.55;max-width:56ch;margin-bottom:32px;">Ministers are scored on Probity (60%) and Legislative Initiative (40%) only. Attendance and question-based metrics are excluded as ministers serve an executive function.</p>
+
+  <div id="minister-table" class="rv d4" style="width:100%;"></div>
+</section>
+
+<!-- 7. METHODOLOGY -->
+<section class="auto-height" data-section="methodology" data-label="Methodology" style="padding-top:100px;padding-bottom:100px;">
+  <div class="eyebrow rv d1">Methodology</div>
+  <h2 class="rv d2" style="font-size:clamp(28px,3.2vw,44px);font-weight:400;letter-spacing:-0.02em;line-height:1.1;max-width:30ch;margin-bottom:20px;">Grounded in <em class="hl-mark">international frameworks</em>.</h2>
+  <p class="rv d3" style="font-size:17px;line-height:1.55;color:var(--ink-1);max-width:56ch;margin-bottom:8px;">The scoring methodology draws from four established frameworks for evaluating legislative performance.</p>
+
+  <div class="method-grid rv d4">
+    <div class="method-card">
+      <div class="method-card-title">IPU Indicators for Democratic Parliaments</div>
+      <div class="method-card-body">
+        The Inter-Parliamentary Union defines 7 SDG-aligned targets with 111 dimensions. This scorecard maps to
+        <span class="tag">Target 1: Effective</span>,
+        <span class="tag">Target 2: Accountable</span>,
+        <span class="tag">Target 4: Responsive</span>, and
+        <span class="tag">Target 6: Participatory</span>.
+      </div>
+    </div>
+    <div class="method-card">
+      <div class="method-card-title">Sansad Ratna Awards</div>
+      <div class="method-card-body">
+        India's premier MP performance awards, founded by Prime Point Foundation. Evaluates questions raised, debates participated, private member bills introduced, and attendance.
+      </div>
+    </div>
+    <div class="method-card">
+      <div class="method-card-title">PRS Legislative Research</div>
+      <div class="method-card-body">
+        Independent research institute tracking Indian legislative activity. Provides attendance percentages, questions asked, and bills data for all state assemblies and Parliament.
+      </div>
+    </div>
+    <div class="method-card">
+      <div class="method-card-title">MyNeta / ADR</div>
+      <div class="method-card-body">
+        Association for Democratic Reforms maintains election affidavit data. Criminal cases, assets, liabilities, and education data sourced from candidate self-declarations.
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:48px;padding:32px;background:var(--bg-soft);border-left:4px solid var(--accent);width:100%;" class="rv d5">
+    <div style="font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink-2);margin-bottom:14px;">Grading Scale</div>
+    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;">
+      <div style="text-align:center;">
+        <span class="grade-badge grade-A-plus" style="font-size:16px;padding:6px 14px;">A+</span>
+        <div style="font-size:12px;color:var(--ink-2);margin-top:8px;">80 &ndash; 100</div>
+      </div>
+      <div style="text-align:center;">
+        <span class="grade-badge grade-A" style="font-size:16px;padding:6px 14px;">A</span>
+        <div style="font-size:12px;color:var(--ink-2);margin-top:8px;">65 &ndash; 79</div>
+      </div>
+      <div style="text-align:center;">
+        <span class="grade-badge grade-B-plus" style="font-size:16px;padding:6px 14px;">B+</span>
+        <div style="font-size:12px;color:var(--ink-2);margin-top:8px;">55 &ndash; 64</div>
+      </div>
+      <div style="text-align:center;">
+        <span class="grade-badge grade-B" style="font-size:16px;padding:6px 14px;">B</span>
+        <div style="font-size:12px;color:var(--ink-2);margin-top:8px;">45 &ndash; 54</div>
+      </div>
+      <div style="text-align:center;">
+        <span class="grade-badge grade-C" style="font-size:16px;padding:6px 14px;">C</span>
+        <div style="font-size:12px;color:var(--ink-2);margin-top:8px;">30 &ndash; 44</div>
+      </div>
+      <div style="text-align:center;">
+        <span class="grade-badge grade-D" style="font-size:16px;padding:6px 14px;">D</span>
+        <div style="font-size:12px;color:var(--ink-2);margin-top:8px;">0 &ndash; 29</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 8. CLOSE -->
+<section class="close-section" data-section="close" data-label="Close">
+  <div class="close-mark rv d1">&#10003;</div>
+  <div class="close-quote rv d2">
+    Every score is <span class="hl">traceable</span>, every ranking is <span class="hl">transparent</span>, and every MLA is <span class="hl">accountable</span>.
+  </div>
+  <div class="close-tag rv d3">Kerala MLA Performance Scorecard &mdash; v2.0 &mdash; {{ generated_date }}</div>
+</section>
+
+</main>
+
+<script>
+(function () {
+  /* ── Data ── */
+  const mlaData = {{ mla_data_json | safe }};
+  const ministerData = {{ minister_data_json | safe }};
+  const partyColors = {{ party_colors_json | safe }};
+
+  /* ── Scroll-reveal observer ── */
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('in');
+        const sec = e.target.closest('section');
+        if (sec) sec.classList.add('in');
+      }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -5% 0px' });
+  document.querySelectorAll('.rv').forEach(el => io.observe(el));
+
+  /* ── Section tracking ── */
+  const sections = Array.from(document.querySelectorAll('section[data-section]'));
+  const ticker = document.getElementById('phaseTicker');
+  const railProgress = document.getElementById('railProgress');
+  const railTicks = Array.from(document.querySelectorAll('.rail-tick'));
+  const plxEls = Array.from(document.querySelectorAll('.plx'));
+  const progressFill = document.getElementById('progressFill');
+  const scrollPctEl = document.getElementById('scrollPct');
+  let pctHideTimer = null;
+  let sectionBounds = [];
+
+  function computeBounds() {
+    sectionBounds = sections.map(s => ({
+      section: s,
+      top: s.getBoundingClientRect().top + window.scrollY,
+      bot: s.getBoundingClientRect().top + window.scrollY + s.offsetHeight
+    }));
+  }
+
+  function onScroll() {
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    const prog = max > 0 ? window.scrollY / max : 0;
+    railProgress.style.transform = 'scaleY(' + Math.min(1, Math.max(0, prog)) + ')';
+    progressFill.style.width = (prog * 100) + '%';
+    scrollPctEl.textContent = Math.round(prog * 100) + '%';
+    scrollPctEl.classList.add('visible');
+    clearTimeout(pctHideTimer);
+    pctHideTimer = setTimeout(() => scrollPctEl.classList.remove('visible'), 1200);
+
+    const mid = window.scrollY + window.innerHeight * 0.5;
+    let current = sectionBounds[sectionBounds.length - 1];
+    for (let i = 0; i < sectionBounds.length; i++) {
+      if (mid >= sectionBounds[i].top && mid < sectionBounds[i].bot) { current = sectionBounds[i]; break; }
+    }
+    if (current) {
+      const id = current.section.dataset.section;
+      const label = current.section.dataset.label || id;
+      ticker.textContent = label;
+      railTicks.forEach(t => t.classList.toggle('active', t.dataset.section === id));
+    }
+
+    /* Parallax */
+    if (window.innerWidth > 900) {
+      const vh = window.innerHeight * 0.5;
+      plxEls.forEach(el => {
+        const c = el.getBoundingClientRect().top + window.scrollY + el.offsetHeight * 0.5;
+        const d = (c - window.scrollY - vh) * -0.05;
+        el.style.transform = 'translate3d(0,' + d.toFixed(2) + 'px,0)';
+      });
+    }
+  }
+
+  railTicks.forEach(tick => {
+    tick.addEventListener('click', () => {
+      const t = document.querySelector('section[data-section="' + tick.dataset.section + '"]');
+      if (t) t.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+
+  let ticking = false;
+  window.addEventListener('scroll', () => {
+    if (!ticking) { requestAnimationFrame(() => { onScroll(); ticking = false; }); ticking = true; }
+  }, { passive: true });
+  window.addEventListener('resize', () => { computeBounds(); onScroll(); }, { passive: true });
+
+  window.addEventListener('load', () => {
+    document.body.classList.add('loaded');
+    const loader = document.getElementById('loaderOverlay');
+    if (loader) { loader.classList.add('hidden'); setTimeout(() => loader.remove(), 700); }
+    computeBounds(); onScroll();
+  });
+
+  /* ── Helper functions ── */
+  function getScoreColor(score) {
+    if (score === null || score === undefined) return '#B0B0B0';
+    if (score >= 65) return '#1E8449';
+    if (score >= 45) return '#B9770E';
+    if (score >= 30) return '#E67E22';
+    return '#B03A2E';
+  }
+
+  function gradeClass(grade) {
+    const map = {'A+': 'grade-A-plus', 'A': 'grade-A', 'B+': 'grade-B-plus', 'B': 'grade-B', 'C': 'grade-C', 'D': 'grade-D'};
+    return map[grade] || 'grade-D';
+  }
+
+  function scoreBar(score) {
+    if (score === null || score === undefined) return '<span style="color:#B0B0B0">N/A</span>';
+    const color = getScoreColor(score);
+    return '<div class="score-bar-wrap"><div class="score-track"><div class="score-fill" style="width:' + score + '%;background:' + color + '"></div></div><span class="score-num" style="color:' + color + '">' + score + '</span></div>';
+  }
+
+  /* ── Regular MLA Table ── */
+  const table = new Tabulator("#mla-table", {
+    data: mlaData,
+    layout: "fitColumns",
+    responsiveLayout: "collapse",
+    pagination: true,
+    paginationSize: 25,
+    initialSort: [{column: "rank", dir: "asc"}],
+    columns: [
+      {title: "Rank", field: "rank", width: 60, hozAlign: "center", sorter: "number"},
+      {title: "MLA Name", field: "name", minWidth: 180,
+        formatter: function(cell) { return '<strong>' + cell.getValue() + '</strong>'; }},
+      {title: "Constituency", field: "constituency", minWidth: 130},
+      {title: "Party", field: "party", minWidth: 100,
+        formatter: function(cell) {
+          var party = cell.getValue();
+          var color = partyColors[party] || '#5A5A5A';
+          return '<span class="party-badge" style="background:' + color + '18;color:' + color + ';border:1px solid ' + color + '40">' + party + '</span>';
+        }},
+      {title: "Alliance", field: "alliance", width: 70, hozAlign: "center"},
+      {title: "Participation", field: "participation_score", width: 130,
+        formatter: function(cell) { return scoreBar(cell.getValue()); }, sorter: "number"},
+      {title: "Accountability", field: "accountability_score", width: 130,
+        formatter: function(cell) { return scoreBar(cell.getValue()); }, sorter: "number"},
+      {title: "Legislative", field: "legislative_score", width: 120,
+        formatter: function(cell) { return scoreBar(cell.getValue()); }, sorter: "number"},
+      {title: "Probity", field: "probity_score", width: 120,
+        formatter: function(cell) { return scoreBar(cell.getValue()); }, sorter: "number"},
+      {title: "Composite", field: "composite_score", width: 110,
+        formatter: function(cell) {
+          var score = cell.getValue();
+          if (score === null) return '<span style="color:#B0B0B0">N/A</span>';
+          var color = getScoreColor(score);
+          return '<span style="font-size:1.2em;font-weight:700;color:' + color + '">' + score + '</span>';
+        }, sorter: "number"},
+      {title: "Grade", field: "grade", width: 70, hozAlign: "center",
+        formatter: function(cell) {
+          var grade = cell.getValue();
+          return '<span class="grade-badge ' + gradeClass(grade) + '">' + grade + '</span>';
+        }},
+    ],
+  });
+
+  /* ── Minister Table ── */
+  new Tabulator("#minister-table", {
+    data: ministerData,
+    layout: "fitColumns",
+    initialSort: [{column: "rank", dir: "asc"}],
+    columns: [
+      {title: "Rank", field: "rank", width: 60, hozAlign: "center", sorter: "number"},
+      {title: "Minister", field: "name", minWidth: 200,
+        formatter: function(cell) { return '<strong>' + cell.getValue() + '</strong>'; }},
+      {title: "Constituency", field: "constituency", minWidth: 140},
+      {title: "Party", field: "party", minWidth: 100,
+        formatter: function(cell) {
+          var party = cell.getValue();
+          var color = partyColors[party] || '#5A5A5A';
+          return '<span class="party-badge" style="background:' + color + '18;color:' + color + ';border:1px solid ' + color + '40">' + party + '</span>';
+        }},
+      {title: "Probity", field: "probity_score", width: 130,
+        formatter: function(cell) { return scoreBar(cell.getValue()); }, sorter: "number"},
+      {title: "Composite", field: "composite_score", width: 120,
+        formatter: function(cell) {
+          var score = cell.getValue();
+          if (score === null) return '<span style="color:#B0B0B0">N/A</span>';
+          var color = getScoreColor(score);
+          return '<span style="font-size:1.2em;font-weight:700;color:' + color + '">' + score + '</span>';
+        }, sorter: "number"},
+      {title: "Grade", field: "grade", width: 70, hozAlign: "center",
+        formatter: function(cell) {
+          var grade = cell.getValue();
+          return '<span class="grade-badge ' + gradeClass(grade) + '">' + grade + '</span>';
+        }},
+    ],
+  });
+
+  /* ── Filters ── */
+  document.getElementById("nameSearch").addEventListener("input", function() {
+    table.setFilter("name", "like", this.value);
+  });
+  document.getElementById("partyFilter").addEventListener("change", function() {
+    if (this.value) table.setFilter("party", "=", this.value);
+    else table.clearFilter(true);
+  });
+  document.getElementById("allianceFilter").addEventListener("change", function() {
+    if (this.value) table.setFilter("alliance", "=", this.value);
+    else table.clearFilter(true);
+  });
+  document.getElementById("gradeFilter").addEventListener("change", function() {
+    if (this.value) table.setFilter("grade", "=", this.value);
+    else table.clearFilter(true);
+  });
+
+  /* ── Charts ── */
+  const gradeDistribution = {{ grade_distribution_json | safe }};
+  const partyScores = {{ party_scores_json | safe }};
+  const scatterData = {{ scatter_data_json | safe }};
+  const allianceScores = {{ alliance_scores_json | safe }};
+
+  const chartFont = { family: "'Hanken Grotesk', sans-serif" };
+  Chart.defaults.font.family = "'Hanken Grotesk', sans-serif";
+
+  const gradePalette = ['#F5E003', '#2ECC71', '#58D68D', '#F39C12', '#E74C3C', '#943126'];
+
+  new Chart(document.getElementById('gradeChart'), {
+    type: 'doughnut',
+    data: {
+      labels: Object.keys(gradeDistribution),
+      datasets: [{
+        data: Object.values(gradeDistribution),
+        backgroundColor: gradePalette,
+        borderWidth: 2,
+        borderColor: '#FFFFFF',
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { position: 'right', labels: { color: '#5A5A5A', font: { size: 12 } } } }
+    }
+  });
+
+  new Chart(document.getElementById('partyChart'), {
+    type: 'bar',
+    data: {
+      labels: Object.keys(partyScores),
+      datasets: [{
+        label: 'Avg Composite Score',
+        data: Object.values(partyScores),
+        backgroundColor: Object.keys(partyScores).map(function(p) { return (partyColors[p] || '#5A5A5A') + '44'; }),
+        borderColor: Object.keys(partyScores).map(function(p) { return partyColors[p] || '#5A5A5A'; }),
+        borderWidth: 2,
+      }]
+    },
+    options: {
+      responsive: true,
+      indexAxis: 'y',
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { min: 0, max: 100, ticks: { color: '#5A5A5A' }, grid: { color: 'rgba(0,0,0,0.06)' } },
+        y: { ticks: { color: '#1A1A1A', font: { weight: 500 } }, grid: { display: false } }
+      }
+    }
+  });
+
+  new Chart(document.getElementById('scatterChart'), {
+    type: 'scatter',
+    data: {
+      datasets: [{
+        label: 'MLAs',
+        data: scatterData,
+        backgroundColor: scatterData.map(function(d) { return getScoreColor(d.composite) + '66'; }),
+        borderColor: scatterData.map(function(d) { return getScoreColor(d.composite); }),
+        borderWidth: 1,
+        pointRadius: 5,
+        pointHoverRadius: 8,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              var d = ctx.raw;
+              return d.name + ': Att ' + d.x + '%, Q ' + d.y;
+            }
+          }
         }
+      },
+      scales: {
+        x: { title: { display: true, text: 'Attendance %', color: '#5A5A5A' },
+              ticks: { color: '#5A5A5A' }, grid: { color: 'rgba(0,0,0,0.06)' } },
+        y: { title: { display: true, text: 'Questions Asked', color: '#5A5A5A' },
+              ticks: { color: '#5A5A5A' }, grid: { color: 'rgba(0,0,0,0.06)' } }
+      }
+    }
+  });
 
-        function gradeClass(grade) {
-            const map = {'A+': 'grade-A-plus', 'A': 'grade-A', 'B+': 'grade-B-plus',
-                         'B': 'grade-B', 'C': 'grade-C', 'D': 'grade-D'};
-            return map[grade] || 'grade-D';
+  var allianceColors = ['#E74C3C', '#3498DB', '#9B59B6', '#1ABC9C'];
+  new Chart(document.getElementById('allianceChart'), {
+    type: 'radar',
+    data: {
+      labels: ['Participation', 'Accountability', 'Legislative', 'Probity'],
+      datasets: Object.keys(allianceScores).map(function(alliance, i) {
+        return {
+          label: alliance,
+          data: [
+            allianceScores[alliance].participation || 0,
+            allianceScores[alliance].accountability || 0,
+            allianceScores[alliance].legislative || 0,
+            allianceScores[alliance].probity || 0,
+          ],
+          borderColor: allianceColors[i] || '#5A5A5A',
+          backgroundColor: (allianceColors[i] || '#5A5A5A') + '18',
+          borderWidth: 2,
+          pointRadius: 4,
+          pointBackgroundColor: allianceColors[i] || '#5A5A5A',
+        };
+      })
+    },
+    options: {
+      responsive: true,
+      scales: {
+        r: {
+          min: 0, max: 100,
+          ticks: { color: '#5A5A5A', backdropColor: 'transparent', font: { size: 10 } },
+          grid: { color: 'rgba(0,0,0,0.08)' },
+          pointLabels: { color: '#1A1A1A', font: { size: 12, weight: 500 } },
         }
+      },
+      plugins: { legend: { labels: { color: '#1A1A1A', font: { size: 12 } } } }
+    }
+  });
 
-        function scoreBar(score) {
-            if (score === null || score === undefined) return '<span style="color:#666">N/A</span>';
-            const color = getScoreColor(score);
-            return `<div style="display:flex;align-items:center;gap:8px;">
-                <div class="score-bar" style="flex:1">
-                    <div class="score-bar-fill" style="width:${score}%;background:${color}"></div>
-                </div>
-                <span style="min-width:35px;text-align:right;font-weight:600;color:${color}">${score}</span>
-            </div>`;
-        }
-
-        // === REGULAR MLA TABLE ===
-        const table = new Tabulator("#mla-table", {
-            data: mlaData,
-            layout: "fitColumns",
-            responsiveLayout: "collapse",
-            pagination: true,
-            paginationSize: 25,
-            initialSort: [{column: "rank", dir: "asc"}],
-            columns: [
-                {title: "#", field: "rank", width: 55, hozAlign: "center", sorter: "number"},
-                {title: "MLA Name", field: "name", minWidth: 180,
-                    formatter: function(cell) { return `<strong>${cell.getValue()}</strong>`; }},
-                {title: "Constituency", field: "constituency", minWidth: 130},
-                {title: "Party", field: "party", minWidth: 100,
-                    formatter: function(cell) {
-                        const party = cell.getValue();
-                        const color = partyColors[party] || '#d4a017';
-                        return `<span class="party-badge" style="background:${color}20;color:${color};border:1px solid ${color}40">${party}</span>`;
-                    }},
-                {title: "Alliance", field: "alliance", width: 70, hozAlign: "center"},
-                {title: "Participation", field: "participation_score", width: 130,
-                    formatter: function(cell) { return scoreBar(cell.getValue()); }, sorter: "number",
-                    titleFormatter: function() { return '<span title="Attendance at Assembly sessions (30%)">Participation</span>'; }},
-                {title: "Accountability", field: "accountability_score", width: 130,
-                    formatter: function(cell) { return scoreBar(cell.getValue()); }, sorter: "number",
-                    titleFormatter: function() { return '<span title="Questions raised for oversight (35%)">Accountability</span>'; }},
-                {title: "Legislative", field: "legislative_score", width: 120,
-                    formatter: function(cell) { return scoreBar(cell.getValue()); }, sorter: "number",
-                    titleFormatter: function() { return '<span title="Bills introduced + committee roles (15%)">Legislative</span>'; }},
-                {title: "Probity", field: "probity_score", width: 120,
-                    formatter: function(cell) { return scoreBar(cell.getValue()); }, sorter: "number",
-                    titleFormatter: function() { return '<span title="Criminal record - fewer cases = higher score (20%)">Probity</span>'; }},
-                {title: "Composite", field: "composite_score", width: 110,
-                    formatter: function(cell) {
-                        const score = cell.getValue();
-                        if (score === null) return '<span style="color:#666">N/A</span>';
-                        const color = getScoreColor(score);
-                        return `<span style="font-size:1.2em;font-weight:700;color:${color}">${score}</span>`;
-                    }, sorter: "number"},
-                {title: "Grade", field: "grade", width: 70, hozAlign: "center",
-                    formatter: function(cell) {
-                        const grade = cell.getValue();
-                        return `<span class="grade-badge ${gradeClass(grade)}">${grade}</span>`;
-                    }},
-            ],
-        });
-
-        // === MINISTER TABLE ===
-        new Tabulator("#minister-table", {
-            data: ministerData,
-            layout: "fitColumns",
-            initialSort: [{column: "rank", dir: "asc"}],
-            columns: [
-                {title: "#", field: "rank", width: 55, hozAlign: "center", sorter: "number"},
-                {title: "Minister", field: "name", minWidth: 200,
-                    formatter: function(cell) { return `<strong>${cell.getValue()}</strong>`; }},
-                {title: "Constituency", field: "constituency", minWidth: 140},
-                {title: "Party", field: "party", minWidth: 100,
-                    formatter: function(cell) {
-                        const party = cell.getValue();
-                        const color = partyColors[party] || '#d4a017';
-                        return `<span class="party-badge" style="background:${color}20;color:${color};border:1px solid ${color}40">${party}</span>`;
-                    }},
-                {title: "Probity", field: "probity_score", width: 130,
-                    formatter: function(cell) { return scoreBar(cell.getValue()); }, sorter: "number"},
-                {title: "Composite", field: "composite_score", width: 120,
-                    formatter: function(cell) {
-                        const score = cell.getValue();
-                        if (score === null) return '<span style="color:#666">N/A</span>';
-                        const color = getScoreColor(score);
-                        return `<span style="font-size:1.2em;font-weight:700;color:${color}">${score}</span>`;
-                    }, sorter: "number"},
-                {title: "Grade", field: "grade", width: 70, hozAlign: "center",
-                    formatter: function(cell) {
-                        const grade = cell.getValue();
-                        return `<span class="grade-badge ${gradeClass(grade)}">${grade}</span>`;
-                    }},
-            ],
-        });
-
-        // === FILTERS ===
-        document.getElementById("nameSearch").addEventListener("input", function() {
-            table.setFilter("name", "like", this.value);
-        });
-        document.getElementById("partyFilter").addEventListener("change", function() {
-            if (this.value) table.setFilter("party", "=", this.value);
-            else table.clearFilter(true);
-        });
-        document.getElementById("allianceFilter").addEventListener("change", function() {
-            if (this.value) table.setFilter("alliance", "=", this.value);
-            else table.clearFilter(true);
-        });
-        document.getElementById("gradeFilter").addEventListener("change", function() {
-            if (this.value) table.setFilter("grade", "=", this.value);
-            else table.clearFilter(true);
-        });
-
-        // === CHARTS ===
-        const gradeDistribution = {{ grade_distribution_json | safe }};
-        const partyScores = {{ party_scores_json | safe }};
-        const scatterData = {{ scatter_data_json | safe }};
-        const allianceScores = {{ alliance_scores_json | safe }};
-
-        const goldPalette = ['#ffd74a', '#f0c040', '#d4a017', '#b8860b', '#8b6914', '#5c4a0e'];
-
-        new Chart(document.getElementById('gradeChart'), {
-            type: 'doughnut',
-            data: {
-                labels: Object.keys(gradeDistribution),
-                datasets: [{
-                    data: Object.values(gradeDistribution),
-                    backgroundColor: goldPalette,
-                    borderWidth: 0,
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: { legend: { position: 'right', labels: { color: '#b0a880' } } }
-            }
-        });
-
-        new Chart(document.getElementById('partyChart'), {
-            type: 'bar',
-            data: {
-                labels: Object.keys(partyScores),
-                datasets: [{
-                    label: 'Avg Composite Score',
-                    data: Object.values(partyScores),
-                    backgroundColor: Object.keys(partyScores).map(p => (partyColors[p] || '#d4a017') + '99'),
-                    borderColor: Object.keys(partyScores).map(p => partyColors[p] || '#d4a017'),
-                    borderWidth: 1,
-                }]
-            },
-            options: {
-                responsive: true,
-                indexAxis: 'y',
-                plugins: { legend: { display: false } },
-                scales: {
-                    x: { min: 0, max: 100, ticks: { color: '#b0a880' }, grid: { color: '#3d3518' } },
-                    y: { ticks: { color: '#b0a880' }, grid: { display: false } }
-                }
-            }
-        });
-
-        new Chart(document.getElementById('scatterChart'), {
-            type: 'scatter',
-            data: {
-                datasets: [{
-                    label: 'MLAs',
-                    data: scatterData,
-                    backgroundColor: scatterData.map(d => getScoreColor(d.composite) + '88'),
-                    pointRadius: 5,
-                    pointHoverRadius: 8,
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: function(ctx) {
-                                const d = ctx.raw;
-                                return `${d.name}: Att ${d.x}%, Q ${d.y}`;
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    x: { title: { display: true, text: 'Attendance %', color: '#b0a880' },
-                          ticks: { color: '#b0a880' }, grid: { color: '#3d3518' } },
-                    y: { title: { display: true, text: 'Questions Asked', color: '#b0a880' },
-                          ticks: { color: '#b0a880' }, grid: { color: '#3d3518' } }
-                }
-            }
-        });
-
-        new Chart(document.getElementById('allianceChart'), {
-            type: 'radar',
-            data: {
-                labels: ['Participation', 'Accountability', 'Legislative', 'Probity'],
-                datasets: Object.keys(allianceScores).map((alliance, i) => ({
-                    label: alliance,
-                    data: [
-                        allianceScores[alliance].participation || 0,
-                        allianceScores[alliance].accountability || 0,
-                        allianceScores[alliance].legislative || 0,
-                        allianceScores[alliance].probity || 0,
-                    ],
-                    borderColor: ['#e74c3c', '#3498db', '#9b59b6'][i] || '#d4a017',
-                    backgroundColor: (['#e74c3c22', '#3498db22', '#9b59b622'])[i] || '#d4a01722',
-                    borderWidth: 2,
-                    pointRadius: 3,
-                }))
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    r: {
-                        min: 0, max: 100,
-                        ticks: { color: '#b0a880', backdropColor: 'transparent' },
-                        grid: { color: '#3d3518' },
-                        pointLabels: { color: '#b0a880' },
-                    }
-                },
-                plugins: { legend: { labels: { color: '#b0a880' } } }
-            }
-        });
-    </script>
+  computeBounds(); onScroll();
+})();
+</script>
 </body>
 </html>
