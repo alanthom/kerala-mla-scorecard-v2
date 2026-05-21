@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kerala MLA Scorecard - 15th Assembly (2021-2026)</title>
+    <link href="https://unpkg.com/tabulator-tables@5.5.0/dist/css/tabulator_midnight.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/tabulator-tables@5.5.0/dist/js/tabulator.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #0c0a06;
+            --bg-secondary: #1a1608;
+            --bg-card: #231e0f;
+            --text-primary: #f5f0e0;
+            --text-secondary: #b0a880;
+            --accent: #d4a017;
+            --accent-light: #f0c040;
+            --accent-glow: #ffd74a;
+            --green: #4caf50;
+            --yellow: #f0c040;
+            --orange: #e67e22;
+            --red: #e74c3c;
+            --border: #3d3518;
+            --gold-gradient: linear-gradient(135deg, #d4a017, #f0c040, #d4a017);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-card));
+            border-radius: 16px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: var(--gold-gradient);
+        }
+
+        header h1 {
+            font-size: 2.2em;
+            background: var(--gold-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        header p { color: var(--text-secondary); font-size: 1.1em; }
+
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .stat-card .value {
+            font-size: 2em;
+            font-weight: 700;
+            color: var(--accent-light);
+        }
+
+        .stat-card .label {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+            margin-top: 4px;
+        }
+
+        .filters {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filters select, .filters input {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 0.95em;
+            outline: none;
+        }
+
+        .filters select:focus, .filters input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 8px rgba(212, 160, 23, 0.3);
+        }
+
+        .section-title {
+            font-size: 1.4em;
+            margin: 30px 0 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--accent);
+            display: inline-block;
+            color: var(--accent-light);
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .chart-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .chart-card h3 {
+            margin-bottom: 15px;
+            color: var(--accent-light);
+            font-size: 1em;
+        }
+
+        #mla-table { margin-bottom: 30px; }
+
+        .grade-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.85em;
+        }
+
+        .grade-A-plus { background: var(--accent-glow); color: #000; }
+        .grade-A { background: var(--accent-light); color: #000; }
+        .grade-B-plus { background: var(--green); color: #fff; }
+        .grade-B { background: #66bb6a; color: #000; }
+        .grade-C { background: var(--orange); color: #000; }
+        .grade-D { background: var(--red); color: #fff; }
+
+        .party-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .score-bar {
+            height: 8px;
+            border-radius: 4px;
+            background: #1a1608;
+            overflow: hidden;
+        }
+
+        .score-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .minister-note {
+            background: var(--bg-card);
+            border-left: 4px solid var(--accent);
+            padding: 16px 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
+            color: var(--text-secondary);
+            font-size: 0.95em;
+        }
+
+        .methodology {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 40px;
+            border: 1px solid var(--border);
+        }
+
+        .methodology h3 {
+            margin-bottom: 12px;
+            color: var(--accent-light);
+        }
+
+        .methodology p, .methodology li {
+            color: var(--text-secondary);
+            font-size: 0.9em;
+            margin-bottom: 6px;
+        }
+
+        .methodology a { color: var(--accent-light); }
+
+        .framework-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border: 1px solid var(--accent);
+            border-radius: 12px;
+            font-size: 0.75em;
+            color: var(--accent-light);
+            margin-right: 6px;
+            margin-bottom: 4px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-secondary);
+            font-size: 0.85em;
+        }
+
+        footer a { color: var(--accent-light); text-decoration: none; }
+
+        /* Override Tabulator theme colors */
+        .tabulator {
+            background-color: var(--bg-secondary) !important;
+            border-color: var(--border) !important;
+        }
+        .tabulator .tabulator-header {
+            background-color: var(--bg-card) !important;
+            border-color: var(--border) !important;
+        }
+        .tabulator .tabulator-header .tabulator-col {
+            background-color: var(--bg-card) !important;
+            border-color: var(--border) !important;
+        }
+        .tabulator-row {
+            border-color: var(--border) !important;
+        }
+        .tabulator-row.tabulator-row-even {
+            background-color: rgba(212, 160, 23, 0.03) !important;
+        }
+
+        @media (max-width: 768px) {
+            .charts-grid { grid-template-columns: 1fr; }
+            header h1 { font-size: 1.5em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Kerala MLA Performance Scorecard</h1>
+            <p>15th Legislative Assembly (2021-2026) &bull; 140 MLAs &bull; Data as of Feb 2026</p>
+            <div style="margin-top:12px;">
+                <span class="framework-badge">IPU Indicators</span>
+                <span class="framework-badge">Sansad Ratna</span>
+                <span class="framework-badge">PRS India</span>
+                <span class="framework-badge">MyNeta ADR</span>
+            </div>
+        </header>
+
+        <div class="stats-bar">
+            <div class="stat-card">
+                <div class="value">140</div>
+                <div class="label">Total MLAs</div>
+            </div>
+            <div class="stat-card">
+                <div class="value">140</div>
+                <div class="label">MLAs Scored</div>
+            </div>
+            <div class="stat-card">
+                <div class="value">49.7</div>
+                <div class="label">Average Score</div>
+            </div>
+            <div class="stat-card">
+                <div class="value">90.9%</div>
+                <div class="label">Avg Attendance</div>
+            </div>
+            <div class="stat-card">
+                <div class="value">862</div>
+                <div class="label">Avg Questions</div>
+            </div>
+            <div class="stat-card">
+                <div class="value">28</div>
+                <div class="label">Ministers</div>
+            </div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="chart-card">
+                <h3>Grade Distribution</h3>
+                <canvas id="gradeChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>Party-wise Average Score</h3>
+                <canvas id="partyChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>Attendance vs Questions Asked</h3>
+                <canvas id="scatterChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>Alliance Comparison</h3>
+                <canvas id="allianceChart"></canvas>
+            </div>
+        </div>
+
+        <h2 class="section-title">Regular MLAs</h2>
+
+        <div class="filters">
+            <input type="text" id="nameSearch" placeholder="Search MLA name..." />
+            <select id="partyFilter">
+                <option value="">All Parties</option>
+                
+                <option value="Communist Party of India">Communist Party of India</option>
+                
+                <option value="Communist Party of India (Marxist)">Communist Party of India (Marxist)</option>
+                
+                <option value="Congress (Secular)">Congress (Secular)</option>
+                
+                <option value="Independent">Independent</option>
+                
+                <option value="Indian National Congress">Indian National Congress</option>
+                
+                <option value="Indian National League">Indian National League</option>
+                
+                <option value="Indian Union Muslim League">Indian Union Muslim League</option>
+                
+                <option value="Janadhipathiya Kerala Congress">Janadhipathiya Kerala Congress</option>
+                
+                <option value="Janata Dal (Secular)">Janata Dal (Secular)</option>
+                
+                <option value="Kerala Congress">Kerala Congress</option>
+                
+                <option value="Kerala Congress (B)">Kerala Congress (B)</option>
+                
+                <option value="Kerala Congress (Jacob)">Kerala Congress (Jacob)</option>
+                
+                <option value="Kerala Congress (M)">Kerala Congress (M)</option>
+                
+                <option value="Loktantrik Janata Dal">Loktantrik Janata Dal</option>
+                
+                <option value="National Secular Conference">National Secular Conference</option>
+                
+                <option value="Nationalist Congress Party">Nationalist Congress Party</option>
+                
+                <option value="Revolutionary Marxist Party of India">Revolutionary Marxist Party of India</option>
+                
+            </select>
+            <select id="allianceFilter">
+                <option value="">All Alliances</option>
+                <option value="LDF">LDF</option>
+                <option value="UDF">UDF</option>
+                <option value="Other">Other</option>
+            </select>
+            <select id="gradeFilter">
+                <option value="">All Grades</option>
+                <option value="A+">A+</option>
+                <option value="A">A</option>
+                <option value="B+">B+</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="D">D</option>
+            </select>
+        </div>
+
+        <div id="mla-table"></div>
+
+        <h2 class="section-title">Minister Track</h2>
+        <div class="minister-note">
+            Ministers represent the government in the Assembly. They do not sign the attendance register,
+            ask questions, or introduce private member bills. They are scored separately on Probity and
+            Legislative activity only.
+        </div>
+        <div id="minister-table"></div>
+
+        <div class="methodology">
+            <h3>Scoring Methodology</h3>
+            <p>Based on internationally accepted frameworks:</p>
+            <ul style="padding-left:20px; margin:10px 0;">
+                <li><a href="https://www.parliamentaryindicators.org/">IPU Indicators for Democratic Parliaments</a> (SDG 16.6 &amp; 16.7)</li>
+                <li><a href="https://www.sansadratna.in/">Sansad Ratna Awards</a> criteria</li>
+                <li><a href="https://prsindia.org/mlatrack">PRS Legislative Research</a> MLA Track methodology</li>
+                <li><a href="https://bpac.in/">B.PAC</a> MLA Rating Framework</li>
+            </ul>
+            <p style="margin-top:12px;"><strong>Four scoring dimensions:</strong></p>
+            <ul style="padding-left:20px; margin:10px 0;">
+                <li><strong>Participation (30%)</strong> &mdash; Assembly attendance. IPU Target: Effective + Participatory.</li>
+                <li><strong>Accountability (35%)</strong> &mdash; Questions raised (primary oversight tool). IPU Target: Accountable + Responsive.</li>
+                <li><strong>Legislative Initiative (15%)</strong> &mdash; Private member bills + committee roles. IPU Target: Effective (Lawmaking).</li>
+                <li><strong>Probity (20%)</strong> &mdash; Criminal record from election affidavits. IPU Target: Accountable (Ethics). Education deliberately excluded &mdash; it reflects background, not legislative performance.</li>
+            </ul>
+            <p style="margin-top:12px;">Scores are computed using <strong>percentile ranking</strong> among peers. An MLA at the 80th percentile on a dimension scores 80 on that dimension.</p>
+            <p><strong>Note:</strong> This scorecard measures legislative activity and integrity, not governance impact. An active MLA is not necessarily an effective one, and vice versa.</p>
+        </div>
+
+        <footer>
+            <p>
+                Data:
+                <a href="https://prsindia.org/mlatrack?state=Kerala&assembly_term=15">PRS India</a> &bull;
+                <a href="https://www.myneta.info/Kerala2021/">MyNeta (ADR)</a> &bull;
+                <a href="https://niyamasabha.nic.in/">Kerala Legislative Assembly</a>
+            </p>
+            <p style="margin-top:8px;">Generated on 2026-05-21 &bull; Kerala MLA Scorecard v2.0</p>
+        </footer>
+    </div>
+
+    <script>
+        const mlaData = [{"name": "Aryadan Shoukath", "constituency": "Nilambur", "party": "Indian National Congress", "alliance": "UDF", "age": 61, "gender": "Male", "attendance_pct": 83.3, "questions_asked": 124.0, "participation_score": 10.3, "accountability_score": 1.3, "legislative_score": 50.0, "probity_score": 44.3, "composite_score": 19.9, "grade": "D", "rank": 108, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 2, "total_assets": 130750738.0, "education_myneta": "Others", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "Rahul Mamkootathil", "constituency": "Palakkad", "party": "Indian National Congress", "alliance": "UDF", "age": 36, "gender": "Male", "attendance_pct": 8.3, "questions_asked": 128.0, "participation_score": 0.4, "accountability_score": 2.2, "legislative_score": 50.0, "probity_score": 82.9, "composite_score": 25.0, "grade": "D", "rank": 104, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 0, "total_assets": 0.0, "education_myneta": "", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "U R Pradeep", "constituency": "Chelakkara", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 52, "gender": "Male", "attendance_pct": 89.1, "questions_asked": 164.0, "participation_score": 26.3, "accountability_score": 3.1, "legislative_score": 50.0, "probity_score": 57.1, "composite_score": 27.9, "grade": "D", "rank": 101, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 1, "total_assets": 1496199.0, "education_myneta": "Graduate Professional", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "Chandy Oommen", "constituency": "Puthuppally", "party": "Indian National Congress", "alliance": "UDF", "age": 40, "gender": "Male", "attendance_pct": 76.1, "questions_asked": 436.0, "participation_score": 3.1, "accountability_score": 9.4, "legislative_score": 50.0, "probity_score": 27.9, "composite_score": 17.3, "grade": "D", "rank": 110, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 4, "total_assets": 1598600.0, "education_myneta": "Post Graduate", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "Uma Thomas", "constituency": "Thrikkakara", "party": "Indian National Congress", "alliance": "UDF", "age": 60, "gender": "Female", "attendance_pct": 87.5, "questions_asked": 714.0, "participation_score": 17.9, "accountability_score": 25.4, "legislative_score": 50.0, "probity_score": 82.9, "composite_score": 38.3, "grade": "D", "rank": 89, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 0, "total_assets": 17468899.0, "education_myneta": "Graduate", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "E. K. Vijayan", "constituency": "Nadapuram", "party": "Communist Party of India", "alliance": "Other", "age": 73, "gender": "Male", "attendance_pct": 93.8, "questions_asked": 762.0, "participation_score": 54.0, "accountability_score": 30.8, "legislative_score": 50.0, "probity_score": 82.9, "composite_score": 51.1, "grade": "C", "rank": 55, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 0, "total_assets": 5746625.0, "education_myneta": "12th Pass", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "K. Babu", "constituency": "Nenmara", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 61, "gender": "Male", "attendance_pct": 88.5, "questions_asked": 806.0, "participation_score": 22.3, "accountability_score": 33.5, "legislative_score": 50.0, "probity_score": 5.7, "composite_score": 27.1, "grade": "D", "rank": 102, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 12, "total_assets": 21474880.0, "education_myneta": "Graduate", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "K. Ansalan", "constituency": "Neyyattinkara", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 59, "gender": "Male", "attendance_pct": 97.9, "questions_asked": 808.0, "participation_score": 87.9, "accountability_score": 34.4, "legislative_score": 50.0, "probity_score": 35.7, "composite_score": 53.0, "grade": "C", "rank": 48, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 3, "total_assets": 5218752.0, "education_myneta": "12th Pass", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "A. P. Anilkumar", "constituency": "Wandoor", "party": "Indian National Congress", "alliance": "UDF", "age": 61, "gender": "Male", "attendance_pct": 91.7, "questions_asked": 1139.0, "participation_score": 40.2, "accountability_score": 85.3, "legislative_score": 50.0, "probity_score": 57.1, "composite_score": 60.8, "grade": "B", "rank": 26, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 1, "total_assets": 6887138.0, "education_myneta": "12th Pass", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "Mathew Kuzhalnadan", "constituency": "Muvattupuzha", "party": "Indian National Congress", "alliance": "UDF", "age": 47, "gender": "Male", "attendance_pct": 95.8, "questions_asked": 1198.0, "participation_score": 72.8, "accountability_score": 94.2, "legislative_score": 50.0, "probity_score": 35.7, "composite_score": 69.5, "grade": "B", "rank": 9, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 3, "total_assets": 347702751.0, "education_myneta": "Doctorate", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "Mani C. Kappen", "constituency": "Pala", "party": "Independent", "alliance": "Other", "age": 68, "gender": "Male", "attendance_pct": 84.4, "questions_asked": 761.0, "participation_score": 11.2, "accountability_score": 29.5, "legislative_score": 50.0, "probity_score": 5.7, "composite_score": 22.3, "grade": "D", "rank": 106, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 12, "total_assets": 279330624.0, "education_myneta": "12th Pass", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "C. K . Hareendran", "constituency": "Parassala", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 70, "gender": "Male", "attendance_pct": 90.1, "questions_asked": 891.0, "participation_score": 28.1, "accountability_score": 45.1, "legislative_score": 50.0, "probity_score": 82.9, "composite_score": 48.3, "grade": "D", "rank": 67, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 0, "total_assets": 20637386.0, "education_myneta": "10th Pass", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "Muhammed Muhassin", "constituency": "Pattambi", "party": "Communist Party of India", "alliance": "Other", "age": 40, "gender": "Male", "attendance_pct": 90.1, "questions_asked": 781.0, "participation_score": 30.8, "accountability_score": 32.6, "legislative_score": 50.0, "probity_score": 82.9, "composite_score": 44.7, "grade": "D", "rank": 78, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 0, "total_assets": 6791054.0, "education_myneta": "Graduate Professional", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "K. Premkumar", "constituency": "Ottapalam", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 46, "gender": "Male", "attendance_pct": 97.9, "questions_asked": 837.0, "participation_score": 87.9, "accountability_score": 37.9, "legislative_score": 50.0, "probity_score": 27.9, "composite_score": 52.7, "grade": "C", "rank": 51, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 4, "total_assets": 11293759.0, "education_myneta": "Graduate Professional", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "M. S. Arun Kumar", "constituency": "Mavelikara", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 35, "gender": "Male", "attendance_pct": 96.9, "questions_asked": 1141.0, "participation_score": 79.0, "accountability_score": 86.6, "legislative_score": 50.0, "probity_score": 22.9, "composite_score": 66.1, "grade": "B", "rank": 16, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 5, "total_assets": 1256500.0, "education_myneta": "Graduate", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "T. P. Ramakrishnan", "constituency": "Perambra", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 75, "gender": "Male", "attendance_pct": 91.1, "questions_asked": 1024.0, "participation_score": 36.2, "accountability_score": 63.8, "legislative_score": 50.0, "probity_score": 57.1, "composite_score": 52.1, "grade": "C", "rank": 54, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 1, "total_assets": 3497780.0, "education_myneta": "Graduate", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "K. K. Shailaja Teacher", "constituency": "Mattannur", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 69, "gender": "Female", "attendance_pct": 77.1, "questions_asked": 742.0, "participation_score": 4.5, "accountability_score": 27.2, "legislative_score": 50.0, "probity_score": 22.9, "composite_score": 22.9, "grade": "D", "rank": 105, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 5, "total_assets": 12810471.0, "education_myneta": "Graduate Professional", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "P. T. A. Rahim", "constituency": "Kunnamangalam", "party": "Independent", "alliance": "Other", "age": 76, "gender": "Male", "attendance_pct": 81.5, "questions_asked": 829.0, "participation_score": 8.5, "accountability_score": 37.1, "legislative_score": 50.0, "probity_score": 82.9, "composite_score": 39.6, "grade": "D", "rank": 86, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 0, "total_assets": 12048264.0, "education_myneta": "Graduate Professional", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "A. C. Moideen", "constituency": "Kunnamkulam", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 70, "gender": "Male", "attendance_pct": 91.7, "questions_asked": 855.0, "participation_score": 40.2, "accountability_score": 39.7, "legislative_score": 50.0, "probity_score": 57.1, "composite_score": 44.9, "grade": "D", "rank": 77, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 1, "total_assets": 16517392.0, "education_myneta": "8th Pass", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "P. V. Sreenijin", "constituency": "Kunnathunad", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 49, "gender": "Male", "attendance_pct": 92.2, "questions_asked": 938.0, "participation_score": 44.2, "accountability_score": 49.6, "legislative_score": 50.0, "probity_score": 82.9, "composite_score": 54.7, "grade": "C", "rank": 41, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 0, "total_assets": 153652638.0, "education_myneta": "Post Graduate", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "Kovoor Kunjumon", "constituency": "Kunnathur", "party": "Independent", "alliance": "Other", "age": 57, "gender": "Male", "attendance_pct": 91.7, "questions_asked": 372.0, "participation_score": 40.2, "accountability_score": 4.9, "legislative_score": 50.0, "probity_score": 82.9, "composite_score": 37.9, "grade": "D", "rank": 90, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 0, "total_assets": 0.0, "education_myneta": "", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "K. P. Mohanan", "constituency": "Kuthuparamba", "party": "Loktantrik Janata Dal", "alliance": "LDF", "age": 74, "gender": "Male", "attendance_pct": 94.8, "questions_asked": 871.0, "participation_score": 61.2, "accountability_score": 41.5, "legislative_score": 50.0, "probity_score": 82.9, "composite_score": 57.0, "grade": "C", "rank": 39, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 0, "total_assets": 27128507.0, "education_myneta": "12th Pass", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "Thomas K Thomas", "constituency": "Kuttanad", "party": "Nationalist Congress Party", "alliance": "LDF", "age": 67, "gender": "Male", "attendance_pct": 94.3, "questions_asked": 956.0, "participation_score": 56.7, "accountability_score": 54.0, "legislative_score": 50.0, "probity_score": 82.9, "composite_score": 60.0, "grade": "B", "rank": 31, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 0, "total_assets": 42812019.0, "education_myneta": "10th Pass", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "K. P. Kunhammed Kutti Master", "constituency": "Kuttiadi", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 73, "gender": "Male", "attendance_pct": 95.3, "questions_asked": 1094.0, "participation_score": 68.8, "accountability_score": 79.0, "legislative_score": 50.0, "probity_score": 82.9, "composite_score": 72.4, "grade": "B+", "rank": 5, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 0, "total_assets": 0.0, "education_myneta": "", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "A. Prabhakaran", "constituency": "Malampuzha", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 73, "gender": "Male", "attendance_pct": 92.7, "questions_asked": 749.0, "participation_score": 46.4, "accountability_score": 28.1, "legislative_score": 50.0, "probity_score": 82.9, "composite_score": 47.8, "grade": "D", "rank": 68, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 0, "total_assets": 6067834.0, "education_myneta": "Graduate", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "P. Ubaidulla", "constituency": "Malappuram", "party": "Indian Union Muslim League", "alliance": "UDF", "age": 66, "gender": "Male", "attendance_pct": 99.5, "questions_asked": 1134.0, "participation_score": 99.1, "accountability_score": 83.5, "legislative_score": 50.0, "probity_score": 57.1, "composite_score": 77.9, "grade": "B+", "rank": 2, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 1, "total_assets": 7277610.0, "education_myneta": "8th Pass", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "Murali", "constituency": "Manalur", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 75, "gender": "Male", "attendance_pct": 85.9, "questions_asked": 941.0, "participation_score": 12.9, "accountability_score": 51.3, "legislative_score": 50.0, "probity_score": 27.9, "composite_score": 34.9, "grade": "D", "rank": 92, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 4, "total_assets": 3622805.0, "education_myneta": "Graduate", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "U.A. Latheef", "constituency": "Manjeri", "party": "Indian Union Muslim League", "alliance": "UDF", "age": 75, "gender": "Male", "attendance_pct": 87.0, "questions_asked": 1104.0, "participation_score": 15.2, "accountability_score": 81.7, "legislative_score": 50.0, "probity_score": 44.3, "composite_score": 49.5, "grade": "D", "rank": 58, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 2, "total_assets": 28394930.0, "education_myneta": "Graduate Professional", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "A. K. M. Ashraf", "constituency": "Manjeshwar", "party": "Indian Union Muslim League", "alliance": "UDF", "age": 47, "gender": "Male", "attendance_pct": 94.8, "questions_asked": 1199.0, "participation_score": 61.2, "accountability_score": 95.1, "legislative_score": 50.0, "probity_score": 44.3, "composite_score": 68.0, "grade": "B", "rank": 13, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 2, "total_assets": 4743759.0, "education_myneta": "Graduate", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "Manjalamkuzhi Ali", "constituency": "Mankada", "party": "Indian Union Muslim League", "alliance": "UDF", "age": 74, "gender": "Male", "attendance_pct": 87.0, "questions_asked": 1151.0, "participation_score": 15.2, "accountability_score": 90.2, "legislative_score": 50.0, "probity_score": 82.9, "composite_score": 60.2, "grade": "B", "rank": 29, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 0, "total_assets": 0.0, "education_myneta": "", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "N. Samsudheen", "constituency": "Mannarkad", "party": "Indian Union Muslim League", "alliance": "UDF", "age": 56, "gender": "Male", "attendance_pct": 95.8, "questions_asked": 1141.0, "participation_score": 72.8, "accountability_score": 86.6, "legislative_score": 50.0, "probity_score": 35.7, "composite_score": 66.8, "grade": "B", "rank": 14, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 3, "total_assets": 14647583.0, "education_myneta": "Graduate Professional", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "T. I. Madhusoodanan", "constituency": "Payyannur", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 65, "gender": "Male", "attendance_pct": 93.8, "questions_asked": 1019.0, "participation_score": 54.0, "accountability_score": 62.1, "legislative_score": 50.0, "probity_score": 35.7, "composite_score": 52.6, "grade": "C", "rank": 52, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 3, "total_assets": 9806915.0, "education_myneta": "Graduate", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "Najeeb Kanthapuram", "constituency": "Perinthalmanna", "party": "Indian Union Muslim League", "alliance": "UDF", "age": 49, "gender": "Male", "attendance_pct": 94.8, "questions_asked": 939.0, "participation_score": 61.2, "accountability_score": 50.4, "legislative_score": 50.0, "probity_score": 1.1, "composite_score": 43.7, "grade": "D", "rank": 81, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 21, "total_assets": 19136090.0, "education_myneta": "Graduate Professional", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "Sunny Joseph", "constituency": "Peravoor", "party": "Indian National Congress", "alliance": "UDF", "age": 73, "gender": "Male", "attendance_pct": 91.7, "questions_asked": 1029.0, "participation_score": 40.2, "accountability_score": 64.7, "legislative_score": 50.0, "probity_score": 82.9, "composite_score": 58.8, "grade": "C", "rank": 34, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 0, "total_assets": 8715057.0, "education_myneta": "Graduate Professional", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "K. K. Rema", "constituency": "Vadakara", "party": "Revolutionary Marxist Party of India", "alliance": "Other", "age": 54, "gender": "Female", "attendance_pct": 96.4, "questions_asked": 1153.0, "participation_score": 75.4, "accountability_score": 91.5, "legislative_score": 50.0, "probity_score": 44.3, "composite_score": 71.0, "grade": "B+", "rank": 7, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 2, "total_assets": 9680507.0, "education_myneta": "Graduate Professional", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "Kurukkoli Moideen", "constituency": "Tirur", "party": "Indian Union Muslim League", "alliance": "UDF", "age": 65, "gender": "Male", "attendance_pct": 96.9, "questions_asked": 1023.0, "participation_score": 79.0, "accountability_score": 62.9, "legislative_score": 50.0, "probity_score": 82.9, "composite_score": 69.8, "grade": "B", "rank": 8, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 0, "total_assets": 0.0, "education_myneta": "", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "K. P. A. Majeed", "constituency": "Tirurangadi", "party": "Indian Union Muslim League", "alliance": "UDF", "age": 75, "gender": "Male", "attendance_pct": 93.2, "questions_asked": 1067.0, "participation_score": 49.1, "accountability_score": 73.7, "legislative_score": 50.0, "probity_score": 82.9, "composite_score": 64.6, "grade": "B", "rank": 20, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 0, "total_assets": 18313112.0, "education_myneta": "10th Pass", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "M. Rajagopalan", "constituency": "Trikaripur", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 65, "gender": "Male", "attendance_pct": 93.2, "questions_asked": 1191.0, "participation_score": 49.1, "accountability_score": 92.4, "legislative_score": 50.0, "probity_score": 35.7, "composite_score": 61.7, "grade": "B", "rank": 24, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 3, "total_assets": 4366717.0, "education_myneta": "12th Pass", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "C. H. Kunhambu", "constituency": "Udma", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 65, "gender": "Male", "attendance_pct": 94.3, "questions_asked": 1039.0, "participation_score": 56.7, "accountability_score": 66.5, "legislative_score": 50.0, "probity_score": 22.9, "composite_score": 52.4, "grade": "C", "rank": 53, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 5, "total_assets": 9513145.0, "education_myneta": "Graduate Professional", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "M. M. Mani", "constituency": "Udumbanchola", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 81, "gender": "Male", "attendance_pct": 88.5, "questions_asked": 671.0, "participation_score": 22.3, "accountability_score": 24.6, "legislative_score": 50.0, "probity_score": 57.1, "composite_score": 34.2, "grade": "D", "rank": 95, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 1, "total_assets": 24294224.0, "education_myneta": "5th Pass", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "C. K. Asha", "constituency": "Vaikom", "party": "Communist Party of India", "alliance": "Other", "age": 49, "gender": "Female", "attendance_pct": 88.5, "questions_asked": 442.0, "participation_score": 22.3, "accountability_score": 10.3, "legislative_score": 50.0, "probity_score": 82.9, "composite_score": 34.4, "grade": "D", "rank": 93, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 0, "total_assets": 5699025.0, "education_myneta": "Graduate", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "Abdul Hameed Master", "constituency": "Vallikkunnu", "party": "Indian Union Muslim League", "alliance": "UDF", "age": 78, "gender": "Male", "attendance_pct": 97.9, "questions_asked": 1151.0, "participation_score": 87.9, "accountability_score": 90.2, "legislative_score": 50.0, "probity_score": 20.4, "composite_score": 69.5, "grade": "B", "rank": 10, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 6, "total_assets": 30234747.0, "education_myneta": "10th Pass", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "D. K. Murali", "constituency": "Vamanapuram", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 64, "gender": "Male", "attendance_pct": 98.4, "questions_asked": 1232.0, "participation_score": 93.8, "accountability_score": 97.8, "legislative_score": 50.0, "probity_score": 27.9, "composite_score": 75.4, "grade": "B+", "rank": 3, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 4, "total_assets": 17762013.0, "education_myneta": "Graduate Professional", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "V. Joy", "constituency": "Varkala", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 60, "gender": "Male", "attendance_pct": 97.4, "questions_asked": 1133.0, "participation_score": 82.6, "accountability_score": 82.6, "legislative_score": 50.0, "probity_score": 57.1, "composite_score": 72.6, "grade": "B+", "rank": 4, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 1, "total_assets": 5974083.0, "education_myneta": "Graduate Professional", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "V. K. Prasanth", "constituency": "Vattiyoorkavu", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 43, "gender": "Male", "attendance_pct": 99.5, "questions_asked": 510.0, "participation_score": 99.1, "accountability_score": 14.7, "legislative_score": 50.0, "probity_score": 20.4, "composite_score": 46.5, "grade": "D", "rank": 71, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 6, "total_assets": 8728325.0, "education_myneta": "Graduate Professional", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "P. K. Kunhalikutty", "constituency": "Vengara", "party": "Indian Union Muslim League", "alliance": "UDF", "age": 74, "gender": "Male", "attendance_pct": 81.2, "questions_asked": 74.0, "participation_score": 7.6, "accountability_score": 0.4, "legislative_score": 50.0, "probity_score": 25.0, "composite_score": 14.9, "grade": "D", "rank": 111, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 3, "total_assets": 54904480.0, "education_myneta": "Graduate", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "K. N. Unnikrishnan", "constituency": "Vypen", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 64, "gender": "Male", "attendance_pct": 93.5, "questions_asked": 1046.0, "participation_score": 52.2, "accountability_score": 69.2, "legislative_score": 50.0, "probity_score": 57.1, "composite_score": 58.8, "grade": "C", "rank": 35, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 1, "total_assets": 11948598.0, "education_myneta": "10th Pass", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "P. Balachandran", "constituency": "Thrissur", "party": "Communist Party of India", "alliance": "Other", "age": 61, "gender": "Male", "attendance_pct": 92.2, "questions_asked": 451.0, "participation_score": 44.2, "accountability_score": 11.2, "legislative_score": 50.0, "probity_score": 2.9, "composite_score": 25.3, "grade": "D", "rank": 103, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 14, "total_assets": 6392811.0, "education_myneta": "Post Graduate", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "K. Babu (Thripunithura)", "constituency": "Thripunithura", "party": "Indian National Congress", "alliance": "UDF", "age": 75, "gender": "Male", "attendance_pct": 90.1, "questions_asked": 1081.0, "participation_score": 30.8, "accountability_score": 76.3, "legislative_score": 50.0, "probity_score": 5.7, "composite_score": 44.6, "grade": "D", "rank": 79, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 12, "total_assets": 21474880.0, "education_myneta": "Graduate", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "P. J. Joseph", "constituency": "Thodupuzha", "party": "Kerala Congress", "alliance": "Other", "age": 83, "gender": "Male", "attendance_pct": 50.0, "questions_asked": 407.0, "participation_score": 1.3, "accountability_score": 7.6, "legislative_score": 50.0, "probity_score": 44.3, "composite_score": 19.4, "grade": "D", "rank": 109, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 2, "total_assets": 10351202.0, "education_myneta": "Graduate Professional", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "Linto Joseph", "constituency": "Thiruvambady", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 32, "gender": "Male", "attendance_pct": 96.9, "questions_asked": 959.0, "participation_score": 79.0, "accountability_score": 54.9, "legislative_score": 50.0, "probity_score": 27.9, "composite_score": 56.0, "grade": "C", "rank": 40, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 4, "total_assets": 7692000.0, "education_myneta": "Post Graduate", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "Mathew T. Thomas", "constituency": "Thiruvalla", "party": "Janata Dal (Secular)", "alliance": "LDF", "age": 64, "gender": "Male", "attendance_pct": 95.8, "questions_asked": 409.0, "participation_score": 72.8, "accountability_score": 8.5, "legislative_score": 50.0, "probity_score": 82.9, "composite_score": 48.9, "grade": "D", "rank": 61, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 0, "total_assets": 24956232.0, "education_myneta": "Graduate Professional", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "K. T. Jaleel", "constituency": "Thavanur", "party": "Independent", "alliance": "Other", "age": 58, "gender": "Male", "attendance_pct": 90.6, "questions_asked": 497.0, "participation_score": 33.9, "accountability_score": 13.8, "legislative_score": 50.0, "probity_score": 57.1, "composite_score": 33.9, "grade": "D", "rank": 96, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 1, "total_assets": 11011455.0, "education_myneta": "Doctorate", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "I. C. Balakrishnan", "constituency": "Sulthanbathery", "party": "Indian National Congress", "alliance": "UDF", "age": 50, "gender": "Male", "attendance_pct": 80.7, "questions_asked": 1011.0, "participation_score": 6.7, "accountability_score": 61.2, "legislative_score": 50.0, "probity_score": 11.8, "composite_score": 33.3, "grade": "D", "rank": 97, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 9, "total_assets": 6417760.0, "education_myneta": "8th Pass", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "P. Mammikutty", "constituency": "Shornur", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 73, "gender": "Male", "attendance_pct": 89.6, "questions_asked": 860.0, "participation_score": 27.2, "accountability_score": 40.6, "legislative_score": 50.0, "probity_score": 82.9, "composite_score": 46.5, "grade": "D", "rank": 72, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 0, "total_assets": 5701646.0, "education_myneta": "10th Pass", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "Pramod Narayan", "constituency": "Ranni", "party": "Kerala Congress (M)", "alliance": "Other", "age": 48, "gender": "Male", "attendance_pct": 95.3, "questions_asked": 481.0, "participation_score": 68.8, "accountability_score": 12.1, "legislative_score": 50.0, "probity_score": 82.9, "composite_score": 49.0, "grade": "D", "rank": 60, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 0, "total_assets": 28316397.0, "education_myneta": "Graduate Professional", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "K. K. Ramachandran", "constituency": "Puthukkad", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 57, "gender": "Male", "attendance_pct": 96.9, "questions_asked": 906.0, "participation_score": 79.0, "accountability_score": 48.2, "legislative_score": 50.0, "probity_score": 27.9, "composite_score": 53.6, "grade": "C", "rank": 44, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 4, "total_assets": 5982989.0, "education_myneta": "10th Pass", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "P. S. Supal", "constituency": "Punalur", "party": "Communist Party of India", "alliance": "Other", "age": 55, "gender": "Male", "attendance_pct": 97.4, "questions_asked": 640.0, "participation_score": 82.6, "accountability_score": 21.0, "legislative_score": 50.0, "probity_score": 27.9, "composite_score": 45.2, "grade": "D", "rank": 75, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 4, "total_assets": 9627038.0, "education_myneta": "Graduate", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "Sebastian Kulathunkal", "constituency": "Poonjar", "party": "Kerala Congress (M)", "alliance": "Other", "age": 59, "gender": "Male", "attendance_pct": 97.9, "questions_asked": 975.0, "participation_score": 87.9, "accountability_score": 55.8, "legislative_score": 50.0, "probity_score": 57.1, "composite_score": 64.8, "grade": "B", "rank": 19, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 1, "total_assets": 82945618.0, "education_myneta": "Graduate Professional", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "P. Nandakumar", "constituency": "Ponnani", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 75, "gender": "Male", "attendance_pct": 87.0, "questions_asked": 556.0, "participation_score": 15.2, "accountability_score": 16.5, "legislative_score": 50.0, "probity_score": 82.9, "composite_score": 34.4, "grade": "D", "rank": 94, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 0, "total_assets": 10810284.0, "education_myneta": "10th Pass", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "Anoop Jacob", "constituency": "Piravom", "party": "Kerala Congress (Jacob)", "alliance": "UDF", "age": 48, "gender": "Male", "attendance_pct": 92.2, "questions_asked": 1074.0, "participation_score": 44.2, "accountability_score": 75.4, "legislative_score": 50.0, "probity_score": 13.6, "composite_score": 49.9, "grade": "D", "rank": 57, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 8, "total_assets": 187289677.0, "education_myneta": "Graduate Professional", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "Eldose P Kunnapillil", "constituency": "Perumbavoor", "party": "Indian National Congress", "alliance": "UDF", "age": 47, "gender": "Male", "attendance_pct": 91.7, "questions_asked": 1073.0, "participation_score": 40.2, "accountability_score": 74.6, "legislative_score": 50.0, "probity_score": 35.7, "composite_score": 52.8, "grade": "C", "rank": 49, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 3, "total_assets": 15254414.0, "education_myneta": "Post Graduate", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "P.C. Vishnunadh", "constituency": "Kundara", "party": "Indian National Congress", "alliance": "UDF", "age": 47, "gender": "Male", "attendance_pct": 85.4, "questions_asked": 1203.0, "participation_score": 12.1, "accountability_score": 96.0, "legislative_score": 50.0, "probity_score": 20.4, "composite_score": 48.8, "grade": "D", "rank": 63, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 6, "total_assets": 5318918.0, "education_myneta": "Graduate", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "Thottathil Ravindran", "constituency": "Kozhikode North", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 77, "gender": "Male", "attendance_pct": 94.8, "questions_asked": 761.0, "participation_score": 61.2, "accountability_score": 29.5, "legislative_score": 50.0, "probity_score": 82.9, "composite_score": 52.8, "grade": "C", "rank": 50, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 0, "total_assets": 43094550.0, "education_myneta": "10th Pass", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "Daleema", "constituency": "Aroor", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 59, "gender": "Female", "attendance_pct": 89.1, "questions_asked": 885.0, "participation_score": 25.0, "accountability_score": 44.2, "legislative_score": 50.0, "probity_score": 82.9, "composite_score": 47.0, "grade": "D", "rank": 70, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 0, "total_assets": 10209000.0, "education_myneta": "10th Pass", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "G. Steephen", "constituency": "Aruvikkara", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 55, "gender": "Male", "attendance_pct": 95.3, "questions_asked": 884.0, "participation_score": 68.8, "accountability_score": 43.3, "legislative_score": 50.0, "probity_score": 82.9, "composite_score": 59.9, "grade": "C", "rank": 32, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 0, "total_assets": 3728543.0, "education_myneta": "Graduate Professional", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "O. S. Ambika", "constituency": "Attingal", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 58, "gender": "Female", "attendance_pct": 96.4, "questions_asked": 904.0, "participation_score": 75.4, "accountability_score": 46.9, "legislative_score": 50.0, "probity_score": 82.9, "composite_score": 63.1, "grade": "B", "rank": 21, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 0, "total_assets": 11491296.0, "education_myneta": "10th Pass", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "K. V. Sumesh", "constituency": "Azhikode", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 46, "gender": "Male", "attendance_pct": 97.9, "questions_asked": 880.0, "participation_score": 87.9, "accountability_score": 42.4, "legislative_score": 50.0, "probity_score": 44.3, "composite_score": 57.6, "grade": "C", "rank": 37, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 2, "total_assets": 4849595.0, "education_myneta": "Graduate Professional", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "K. M. Sachindev", "constituency": "Balusseri", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 31, "gender": "Male", "attendance_pct": 99.0, "questions_asked": 1001.0, "participation_score": 96.4, "accountability_score": 59.8, "legislative_score": 50.0, "probity_score": 16.8, "composite_score": 60.7, "grade": "B", "rank": 27, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 7, "total_assets": 26823208.0, "education_myneta": "Graduate Professional", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "Saneeshkumar Joseph", "constituency": "Chalakkudy", "party": "Indian National Congress", "alliance": "UDF", "age": 46, "gender": "Male", "attendance_pct": 92.7, "questions_asked": 1063.0, "participation_score": 46.4, "accountability_score": 72.3, "legislative_score": 50.0, "probity_score": 9.3, "composite_score": 48.6, "grade": "D", "rank": 65, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 10, "total_assets": 28199852.0, "education_myneta": "Graduate", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "Roji M. John", "constituency": "Angamaly", "party": "Indian National Congress", "alliance": "UDF", "age": 43, "gender": "Male", "attendance_pct": 77.1, "questions_asked": 1095.0, "participation_score": 4.5, "accountability_score": 80.4, "legislative_score": 50.0, "probity_score": 82.9, "composite_score": 53.6, "grade": "C", "rank": 45, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 0, "total_assets": 0.0, "education_myneta": "", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "Job Maichil", "constituency": "Changanassery", "party": "Kerala Congress (M)", "alliance": "Other", "age": 59, "gender": "Male", "attendance_pct": 97.9, "questions_asked": 993.0, "participation_score": 87.9, "accountability_score": 58.5, "legislative_score": 50.0, "probity_score": 35.7, "composite_score": 61.5, "grade": "B", "rank": 25, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 3, "total_assets": 11247336.0, "education_myneta": "Graduate Professional", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "G. S. Jayalal", "constituency": "Chathannur", "party": "Communist Party of India", "alliance": "Other", "age": 53, "gender": "Male", "attendance_pct": 96.4, "questions_asked": 780.0, "participation_score": 75.4, "accountability_score": 31.7, "legislative_score": 50.0, "probity_score": 35.7, "composite_score": 48.4, "grade": "D", "rank": 66, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 3, "total_assets": 19938831.0, "education_myneta": "10th Pass", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "Sujith Vijayanpillai", "constituency": "Chavara", "party": "Independent", "alliance": "Other", "age": 47, "gender": "Male", "attendance_pct": 98.4, "questions_asked": 566.0, "participation_score": 93.8, "accountability_score": 17.4, "legislative_score": 50.0, "probity_score": 82.9, "composite_score": 58.3, "grade": "C", "rank": 36, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 0, "total_assets": 43068009.0, "education_myneta": "Post Graduate", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "V. Sasi", "constituency": "Chirayinkeezhu", "party": "Communist Party of India", "alliance": "Other", "age": 75, "gender": "Male", "attendance_pct": 97.9, "questions_asked": 659.0, "participation_score": 87.9, "accountability_score": 23.7, "legislative_score": 50.0, "probity_score": 57.1, "composite_score": 53.6, "grade": "C", "rank": 46, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 1, "total_assets": 6155120.0, "education_myneta": "Graduate Professional", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "H. Salam", "constituency": "Ambalapuzha", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 52, "gender": "Male", "attendance_pct": 88.5, "questions_asked": 951.0, "participation_score": 22.3, "accountability_score": 52.2, "legislative_score": 50.0, "probity_score": 16.8, "composite_score": 35.8, "grade": "D", "rank": 91, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 7, "total_assets": 4030336.0, "education_myneta": "12th Pass", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "A. Raja", "constituency": "Devikulam", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 39, "gender": "Male", "attendance_pct": 91.7, "questions_asked": 647.0, "participation_score": 40.2, "accountability_score": 22.8, "legislative_score": 50.0, "probity_score": 57.1, "composite_score": 39.0, "grade": "D", "rank": 88, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 1, "total_assets": 3315231.0, "education_myneta": "Graduate Professional", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "Kanathil Jameela", "constituency": "Quilandy", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 58, "gender": "Female", "attendance_pct": 95.2, "questions_asked": 737.0, "participation_score": 65.6, "accountability_score": 26.3, "legislative_score": 50.0, "probity_score": 57.1, "composite_score": 47.8, "grade": "D", "rank": 69, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 1, "total_assets": 19093781.0, "education_myneta": "10th Pass", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "C. C. Mukundhan", "constituency": "Nattika", "party": "Communist Party of India", "alliance": "Other", "age": 66, "gender": "Male", "attendance_pct": 82.8, "questions_asked": 380.0, "participation_score": 9.4, "accountability_score": 6.7, "legislative_score": 50.0, "probity_score": 82.9, "composite_score": 29.2, "grade": "D", "rank": 98, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 0, "total_assets": 1602366.0, "education_myneta": "8th Pass", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "M. Vincent", "constituency": "Kovalam", "party": "Indian National Congress", "alliance": "UDF", "age": 57, "gender": "Male", "attendance_pct": 97.9, "questions_asked": 1149.0, "participation_score": 87.9, "accountability_score": 88.8, "legislative_score": 50.0, "probity_score": 9.3, "composite_score": 66.8, "grade": "B", "rank": 15, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 10, "total_assets": 1456486.0, "education_myneta": "Graduate", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "Vazhoor Soman", "constituency": "Peerumade", "party": "Communist Party of India", "alliance": "Other", "age": 72, "gender": "Male", "attendance_pct": 93.5, "questions_asked": 373.0, "participation_score": 51.3, "accountability_score": 5.8, "legislative_score": 50.0, "probity_score": 82.9, "composite_score": 41.5, "grade": "D", "rank": 84, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 0, "total_assets": 6928600.0, "education_myneta": "10th Pass", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "Anwar Sadath", "constituency": "Aluva", "party": "Indian National Congress", "alliance": "UDF", "age": 51, "gender": "Male", "attendance_pct": 94.8, "questions_asked": 1095.0, "participation_score": 61.2, "accountability_score": 80.4, "legislative_score": 50.0, "probity_score": 1.8, "composite_score": 54.4, "grade": "C", "rank": 42, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 18, "total_assets": 6257578.0, "education_myneta": "10th Pass", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "P. P. Sumod", "constituency": "Tarur", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 41, "gender": "Male", "attendance_pct": 94.8, "questions_asked": 824.0, "participation_score": 61.2, "accountability_score": 36.2, "legislative_score": 50.0, "probity_score": 22.9, "composite_score": 43.1, "grade": "D", "rank": 82, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 5, "total_assets": 994497.0, "education_myneta": "Post Graduate", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "P. P. Chitharanjan", "constituency": "Alappuzha", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 62, "gender": "Male", "attendance_pct": 94.3, "questions_asked": 1044.0, "participation_score": 56.7, "accountability_score": 68.3, "legislative_score": 50.0, "probity_score": 13.6, "composite_score": 51.1, "grade": "C", "rank": 56, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 8, "total_assets": 9753406.0, "education_myneta": "10th Pass", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "K. D. Prasenan", "constituency": "Alathur", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 60, "gender": "Male", "attendance_pct": 95.3, "questions_asked": 1089.0, "participation_score": 68.8, "accountability_score": 78.1, "legislative_score": 50.0, "probity_score": 82.9, "composite_score": 72.1, "grade": "B+", "rank": 6, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 0, "total_assets": 20637386.0, "education_myneta": "10th Pass", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "Thiruvanchoor Radhakrishnan", "constituency": "Kottayam", "party": "Indian National Congress", "alliance": "UDF", "age": 76, "gender": "Male", "attendance_pct": 87.5, "questions_asked": 1049.0, "participation_score": 17.9, "accountability_score": 70.1, "legislative_score": 50.0, "probity_score": 57.1, "composite_score": 48.8, "grade": "D", "rank": 64, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 1, "total_assets": 24060184.0, "education_myneta": "Graduate Professional", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "M. K. Muneer", "constituency": "Koduvally", "party": "Indian Union Muslim League", "alliance": "UDF", "age": 63, "gender": "Male", "attendance_pct": 54.2, "questions_asked": 955.0, "participation_score": 2.2, "accountability_score": 53.1, "legislative_score": 50.0, "probity_score": 7.5, "composite_score": 28.2, "grade": "D", "rank": 100, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 11, "total_assets": 43425895.0, "education_myneta": "Graduate Professional", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "N. A. Nellikkunnu", "constituency": "Kasaragod", "party": "Indian Union Muslim League", "alliance": "UDF", "age": 72, "gender": "Male", "attendance_pct": 90.1, "questions_asked": 1196.0, "participation_score": 30.8, "accountability_score": 93.3, "legislative_score": 50.0, "probity_score": 82.9, "composite_score": 66.0, "grade": "B", "rank": 17, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 0, "total_assets": 17277779.0, "education_myneta": "12th Pass", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "I. B. Satheesh", "constituency": "Kattakkada", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 55, "gender": "Male", "attendance_pct": 93.2, "questions_asked": 842.0, "participation_score": 49.1, "accountability_score": 38.8, "legislative_score": 50.0, "probity_score": 16.8, "composite_score": 39.2, "grade": "D", "rank": 87, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 7, "total_assets": 66912677.0, "education_myneta": "Graduate Professional", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "U. Prathibha", "constituency": "Kayamkulam", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 47, "gender": "Female", "attendance_pct": 95.3, "questions_asked": 814.0, "participation_score": 68.8, "accountability_score": 35.3, "legislative_score": 50.0, "probity_score": 82.9, "composite_score": 57.1, "grade": "C", "rank": 38, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 0, "total_assets": 0.0, "education_myneta": "", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "Kadakampally Surendran", "constituency": "Kazhakkoottam", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 73, "gender": "Male", "attendance_pct": 89.1, "questions_asked": 491.0, "participation_score": 25.0, "accountability_score": 12.9, "legislative_score": 50.0, "probity_score": 3.9, "composite_score": 20.3, "grade": "D", "rank": 107, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 13, "total_assets": 13167394.0, "education_myneta": "Graduate", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "K. J. Maxy", "constituency": "Kochi", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 63, "gender": "Male", "attendance_pct": 94.8, "questions_asked": 1033.0, "participation_score": 61.2, "accountability_score": 65.6, "legislative_score": 50.0, "probity_score": 57.1, "composite_score": 60.2, "grade": "B", "rank": 30, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 1, "total_assets": 15900255.0, "education_myneta": "8th Pass", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "V. R. Sunilkumar", "constituency": "Kodungallur", "party": "Communist Party of India", "alliance": "Other", "age": 57, "gender": "Male", "attendance_pct": 99.4, "questions_asked": 629.0, "participation_score": 97.8, "accountability_score": 20.1, "legislative_score": 50.0, "probity_score": 82.9, "composite_score": 60.5, "grade": "B", "rank": 28, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 0, "total_assets": 24275312.0, "education_myneta": "Graduate Professional", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "M. Mukesh", "constituency": "Kollam", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 69, "gender": "Male", "attendance_pct": 93.2, "questions_asked": 581.0, "participation_score": 49.1, "accountability_score": 18.3, "legislative_score": 50.0, "probity_score": 57.1, "composite_score": 40.1, "grade": "D", "rank": 85, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 1, "total_assets": 142420240.0, "education_myneta": "Graduate", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "T. V. Ibrahim", "constituency": "Kondotty", "party": "Indian Union Muslim League", "alliance": "UDF", "age": 60, "gender": "Male", "attendance_pct": 98.4, "questions_asked": 1321.0, "participation_score": 93.8, "accountability_score": 99.6, "legislative_score": 50.0, "probity_score": 57.1, "composite_score": 81.9, "grade": "A", "rank": 1, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 1, "total_assets": 24279135.0, "education_myneta": "Post Graduate", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "Santhakumari K.", "constituency": "Kongad", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 53, "gender": "Female", "attendance_pct": 90.6, "questions_asked": 987.0, "participation_score": 33.9, "accountability_score": 57.6, "legislative_score": 50.0, "probity_score": 82.9, "composite_score": 54.4, "grade": "C", "rank": 43, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 0, "total_assets": 4130431.0, "education_myneta": "Graduate Professional", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "K.U. Jenish Kumar", "constituency": "Konni", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 43, "gender": "Male", "attendance_pct": 99.0, "questions_asked": 518.0, "participation_score": 96.4, "accountability_score": 15.6, "legislative_score": 50.0, "probity_score": 16.8, "composite_score": 45.2, "grade": "D", "rank": 76, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 7, "total_assets": 3617244.0, "education_myneta": "Graduate Professional", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "Antony John", "constituency": "Kothamangalam", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 42, "gender": "Male", "attendance_pct": 88.3, "questions_asked": 900.0, "participation_score": 20.1, "accountability_score": 46.0, "legislative_score": 50.0, "probity_score": 82.9, "composite_score": 46.2, "grade": "D", "rank": 73, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 0, "total_assets": 14083623.0, "education_myneta": "Graduate", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "Abid Hussain Thangal", "constituency": "Kottakkal", "party": "Indian Union Muslim League", "alliance": "UDF", "age": 65, "gender": "Male", "attendance_pct": 91.1, "questions_asked": 1239.0, "participation_score": 36.2, "accountability_score": 98.7, "legislative_score": 50.0, "probity_score": 44.3, "composite_score": 61.8, "grade": "B", "rank": 23, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 2, "total_assets": 19595855.0, "education_myneta": "Post Graduate", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "C. R. Mahesh", "constituency": "Karunagappally", "party": "Indian National Congress", "alliance": "UDF", "age": 46, "gender": "Male", "attendance_pct": 87.0, "questions_asked": 1138.0, "participation_score": 15.2, "accountability_score": 84.4, "legislative_score": 50.0, "probity_score": 11.8, "composite_score": 44.0, "grade": "D", "rank": 80, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 9, "total_assets": 1910946.0, "education_myneta": "Graduate", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "P. K. Basheer", "constituency": "Eranad", "party": "Indian Union Muslim League", "alliance": "UDF", "age": 66, "gender": "Male", "attendance_pct": 91.1, "questions_asked": 1221.0, "participation_score": 36.2, "accountability_score": 96.9, "legislative_score": 50.0, "probity_score": 82.9, "composite_score": 68.9, "grade": "B", "rank": 11, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 0, "total_assets": 20637386.0, "education_myneta": "10th Pass", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "T. J. Vinod", "constituency": "Eranakulam", "party": "Indian National Congress", "alliance": "UDF", "age": 61, "gender": "Male", "attendance_pct": 95.3, "questions_asked": 1058.0, "participation_score": 68.8, "accountability_score": 71.0, "legislative_score": 50.0, "probity_score": 0.4, "composite_score": 53.1, "grade": "C", "rank": 47, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 23, "total_assets": 39424866.0, "education_myneta": "12th Pass", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "M. Noushad", "constituency": "Eravipuram", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 61, "gender": "Male", "attendance_pct": 90.1, "questions_asked": 620.0, "participation_score": 30.8, "accountability_score": 19.2, "legislative_score": 50.0, "probity_score": 27.9, "composite_score": 29.0, "grade": "D", "rank": 99, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 4, "total_assets": 5658667.0, "education_myneta": "12th Pass", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "N. K. Akbar", "constituency": "Guruvayoor", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 55, "gender": "Male", "attendance_pct": 97.9, "questions_asked": 906.0, "participation_score": 87.9, "accountability_score": 48.2, "legislative_score": 50.0, "probity_score": 57.1, "composite_score": 62.2, "grade": "B", "rank": 22, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 1, "total_assets": 4703139.0, "education_myneta": "Graduate", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "Ramesh Chennithala", "constituency": "Haripad", "party": "Indian National Congress", "alliance": "UDF", "age": 69, "gender": "Male", "attendance_pct": 78.1, "questions_asked": 339.0, "participation_score": 5.8, "accountability_score": 4.0, "legislative_score": 50.0, "probity_score": 16.8, "composite_score": 14.0, "grade": "D", "rank": 112, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 7, "total_assets": 35423745.0, "education_myneta": "Graduate", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "Sajeev Joseph", "constituency": "Irikkur", "party": "Indian National Congress", "alliance": "UDF", "age": 52, "gender": "Male", "attendance_pct": 94.9, "questions_asked": 1043.0, "participation_score": 64.7, "accountability_score": 67.4, "legislative_score": 50.0, "probity_score": 44.3, "composite_score": 59.4, "grade": "C", "rank": 33, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 2, "total_assets": 10351202.0, "education_myneta": "Graduate Professional", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "E. Chandrashekaran", "constituency": "Kanhangad", "party": "Communist Party of India", "alliance": "Other", "age": 77, "gender": "Male", "attendance_pct": 96.9, "questions_asked": 1001.0, "participation_score": 79.0, "accountability_score": 59.8, "legislative_score": 50.0, "probity_score": 82.9, "composite_score": 68.7, "grade": "B", "rank": 12, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 0, "total_assets": 3881351.0, "education_myneta": "10th Pass", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "Mons Joseph", "constituency": "Kaduthuruthy", "party": "Kerala Congress", "alliance": "Other", "age": 61, "gender": "Male", "attendance_pct": 88.0, "questions_asked": 1083.0, "participation_score": 19.2, "accountability_score": 77.2, "legislative_score": 50.0, "probity_score": 44.3, "composite_score": 49.1, "grade": "D", "rank": 59, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 2, "total_assets": 18909273.0, "education_myneta": "Graduate Professional", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "E. T. Taison Master", "constituency": "Kaipamangalam", "party": "Communist Party of India", "alliance": "Other", "age": 61, "gender": "Male", "attendance_pct": 98.4, "questions_asked": 646.0, "participation_score": 93.8, "accountability_score": 21.9, "legislative_score": 50.0, "probity_score": 27.9, "composite_score": 48.9, "grade": "D", "rank": 62, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 4, "total_assets": 11941626.0, "education_myneta": "10th Pass", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "M. Vijin", "constituency": "Kalliasseri", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 35, "gender": "Male", "attendance_pct": 97.4, "questions_asked": 1147.0, "participation_score": 82.6, "accountability_score": 87.9, "legislative_score": 50.0, "probity_score": 9.3, "composite_score": 64.9, "grade": "B", "rank": 18, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 10, "total_assets": 1456486.0, "education_myneta": "Graduate", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "T. Siddiqu", "constituency": "Kalpetta", "party": "Indian National Congress", "alliance": "UDF", "age": 50, "gender": "Male", "attendance_pct": 90.1, "questions_asked": 1063.0, "participation_score": 30.8, "accountability_score": 72.3, "legislative_score": 50.0, "probity_score": 2.9, "composite_score": 42.6, "grade": "D", "rank": 83, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 14, "total_assets": 11853809.0, "education_myneta": "Graduate Professional", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}, {"name": "Xavier Chittilappilly", "constituency": "Wadakkanchery", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 53, "gender": "Male", "attendance_pct": 93.8, "questions_asked": 980.0, "participation_score": 54.0, "accountability_score": 56.7, "legislative_score": 50.0, "probity_score": 9.3, "composite_score": 45.4, "grade": "D", "rank": 74, "total_ranked": 112, "scoring_track": "regular", "criminal_cases_count": 10, "total_assets": 4210407.0, "education_myneta": "8th Pass", "private_bills_count": 0, "committee_points": 0, "note": " Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": false}];
+        const ministerData = [{"name": "K. Rajan", "constituency": "Ollur", "party": "Communist Party of India", "alliance": "Other", "age": 52, "gender": "Male", "attendance_pct": null, "questions_asked": null, "participation_score": null, "accountability_score": null, "legislative_score": null, "probity_score": 57.1, "composite_score": 57.1, "grade": "C", "rank": 12, "total_ranked": 28, "scoring_track": "minister", "criminal_cases_count": 1, "total_assets": 9902271.0, "education_myneta": "Graduate Professional", "private_bills_count": 0, "committee_points": 0, "note": "This MLA is a Minister. Ministers represent the government in debates, so we do not report their participation. They do not sign the attendance register, ask questions, or introduce private member bills. Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": true}, {"name": "G. R. Anil", "constituency": "Nedumangad", "party": "Communist Party of India", "alliance": "Other", "age": 62, "gender": "Male", "attendance_pct": null, "questions_asked": null, "participation_score": null, "accountability_score": null, "legislative_score": null, "probity_score": 35.7, "composite_score": 35.7, "grade": "D", "rank": 21, "total_ranked": 28, "scoring_track": "minister", "criminal_cases_count": 3, "total_assets": 12832849.0, "education_myneta": "Graduate Professional", "private_bills_count": 0, "committee_points": 0, "note": "This MLA is a Minister. Ministers represent the government in debates, so we do not report their participation. They do not sign the attendance register, ask questions, or introduce private member bills. Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": true}, {"name": "V. Sivankutty", "constituency": "Nemom", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 70, "gender": "Male", "attendance_pct": null, "questions_asked": null, "participation_score": null, "accountability_score": null, "legislative_score": null, "probity_score": 82.9, "composite_score": 82.9, "grade": "A", "rank": 1, "total_ranked": 28, "scoring_track": "minister", "criminal_cases_count": 0, "total_assets": 31010907.0, "education_myneta": "8th Pass", "private_bills_count": 0, "committee_points": 0, "note": "This MLA is a Minister. Ministers represent the government in debates, so we do not report their participation. They do not sign the attendance register, ask questions, or introduce private member bills. Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": true}, {"name": "V. D. Satheesan", "constituency": "Paravur", "party": "Indian National Congress", "alliance": "UDF", "age": 61, "gender": "Male", "attendance_pct": null, "questions_asked": null, "participation_score": null, "accountability_score": null, "legislative_score": null, "probity_score": 16.8, "composite_score": 16.8, "grade": "D", "rank": 25, "total_ranked": 28, "scoring_track": "minister", "criminal_cases_count": 7, "total_assets": 66912677.0, "education_myneta": "Graduate Professional", "private_bills_count": 0, "committee_points": 0, "note": "This MLA is the Leader of Opposition. Ministers represent the government in debates, so we do not report their participation. They do not sign the attendance register, ask questions, or introduce private member bills. Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": true}, {"name": "K. B. Ganesh Kumar", "constituency": "Pathanapuram", "party": "Kerala Congress (B)", "alliance": "LDF", "age": 59, "gender": "Male", "attendance_pct": 65.0, "questions_asked": 237.0, "participation_score": null, "accountability_score": null, "legislative_score": null, "probity_score": 16.8, "composite_score": 16.8, "grade": "D", "rank": 26, "total_ranked": 28, "scoring_track": "minister", "criminal_cases_count": 7, "total_assets": 193800496.0, "education_myneta": "12th Pass", "private_bills_count": 0, "committee_points": 0, "note": "This MLA has been a Minister from 29 December 2023. Ministers represent the government in debates, so we do not report their participation. They do not sign the attendance register, ask questions, or introduce private member bills. Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": true}, {"name": "O. R. Kelu", "constituency": "Mananthavady", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 55, "gender": "Male", "attendance_pct": 84.8, "questions_asked": 675.0, "participation_score": null, "accountability_score": null, "legislative_score": null, "probity_score": 57.1, "composite_score": 57.1, "grade": "C", "rank": 13, "total_ranked": 28, "scoring_track": "minister", "criminal_cases_count": 1, "total_assets": 3770086.0, "education_myneta": "8th Pass", "private_bills_count": 0, "committee_points": 0, "note": "This MLA has been a Minister from 23 June 2024. Ministers represent the government in debates, so we do not report their participation. They do not sign the attendance register, ask questions, or introduce private member bills. Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": true}, {"name": "M. B. Rajesh", "constituency": "Thrithala", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 55, "gender": "Male", "attendance_pct": null, "questions_asked": null, "participation_score": null, "accountability_score": null, "legislative_score": null, "probity_score": 11.8, "composite_score": 11.8, "grade": "D", "rank": 27, "total_ranked": 28, "scoring_track": "minister", "criminal_cases_count": 9, "total_assets": 1910946.0, "education_myneta": "Graduate", "private_bills_count": 0, "committee_points": 0, "note": "This MLA was a Speaker till 3 September 2022 And has been re-appointed as a Minister from 6 September 2022. We do not report their participation. They do not sign the attendance register, ask questions, or introduce private member bills. Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": true}, {"name": "Ahammad Devarkovil", "constituency": "Kozhikode South", "party": "Indian National League", "alliance": "LDF", "age": 65, "gender": "Male", "attendance_pct": 97.6, "questions_asked": 162.0, "participation_score": null, "accountability_score": null, "legislative_score": null, "probity_score": 82.9, "composite_score": 82.9, "grade": "A", "rank": 2, "total_ranked": 28, "scoring_track": "minister", "criminal_cases_count": 0, "total_assets": 0.0, "education_myneta": "", "private_bills_count": 0, "committee_points": 0, "note": "This MLA was a Minister till 24 December 2023. Ministers represent the government in debates, so we do not report their participation. They do not sign the attendance register, ask questions, or introduce private member bills. Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": true}, {"name": "A. N. Shamseer", "constituency": "Thalassery", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 48, "gender": "Male", "attendance_pct": 95.8, "questions_asked": 255.0, "participation_score": null, "accountability_score": null, "legislative_score": null, "probity_score": 82.9, "composite_score": 82.9, "grade": "A", "rank": 3, "total_ranked": 28, "scoring_track": "minister", "criminal_cases_count": 0, "total_assets": 20637386.0, "education_myneta": "10th Pass", "private_bills_count": 0, "committee_points": 0, "note": "This MLA has been a Speaker from 12 September 2022. We do not report their participation. They do not sign the attendance register, ask questions, or introduce private member bills. Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": true}, {"name": "M. V. Govindan Master", "constituency": "Taliparamba", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 73, "gender": "Male", "attendance_pct": 49.2, "questions_asked": 309.0, "participation_score": null, "accountability_score": null, "legislative_score": null, "probity_score": 27.9, "composite_score": 27.9, "grade": "D", "rank": 24, "total_ranked": 28, "scoring_track": "minister", "criminal_cases_count": 4, "total_assets": 11941626.0, "education_myneta": "10th Pass", "private_bills_count": 0, "committee_points": 0, "note": "This MLA was a Minister till 5 September 2022. Ministers represent the government in debates, so we do not report their participation. They do not sign the attendance register, ask questions, or introduce private member bills. Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": true}, {"name": "J. Chinchu Rani", "constituency": "Chadayamangalam", "party": "Communist Party of India", "alliance": "Other", "age": 62, "gender": "Female", "attendance_pct": null, "questions_asked": null, "participation_score": null, "accountability_score": null, "legislative_score": null, "probity_score": 44.3, "composite_score": 44.3, "grade": "D", "rank": 18, "total_ranked": 28, "scoring_track": "minister", "criminal_cases_count": 2, "total_assets": 3772000.0, "education_myneta": "10th Pass", "private_bills_count": 0, "committee_points": 0, "note": "This MLA is a Minister. Ministers represent the government in debates, so we do not report their participation. They do not sign the attendance register, ask questions, or introduce private member bills. Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": true}, {"name": "P. A. Mohamed Riyas", "constituency": "Beypore", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 49, "gender": "Male", "attendance_pct": null, "questions_asked": null, "participation_score": null, "accountability_score": null, "legislative_score": null, "probity_score": 5.7, "composite_score": 5.7, "grade": "D", "rank": 28, "total_ranked": 28, "scoring_track": "minister", "criminal_cases_count": 12, "total_assets": 18264276.0, "education_myneta": "Graduate Professional", "private_bills_count": 0, "committee_points": 0, "note": "This MLA is a Minister. Ministers represent the government in debates, so we do not report their participation. They do not sign the attendance register, ask questions, or introduce private member bills. Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": true}, {"name": "Saji Cheriyan", "constituency": "Chengannur", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 60, "gender": "Male", "attendance_pct": 100.0, "questions_asked": 84.0, "participation_score": null, "accountability_score": null, "legislative_score": null, "probity_score": 82.9, "composite_score": 82.9, "grade": "A", "rank": 4, "total_ranked": 28, "scoring_track": "minister", "criminal_cases_count": 0, "total_assets": 6810153.0, "education_myneta": "Graduate", "private_bills_count": 0, "committee_points": 0, "note": "This MLA was a Minister till 6 July 2022. Ministers represent the government in debates, so we do not report their participation. They do not sign the attendance register, ask questions, or introduce private member bills. Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": true}, {"name": "P. Prasad", "constituency": "Cherthala", "party": "Communist Party of India", "alliance": "Other", "age": 55, "gender": "Male", "attendance_pct": null, "questions_asked": null, "participation_score": null, "accountability_score": null, "legislative_score": null, "probity_score": 44.3, "composite_score": 44.3, "grade": "D", "rank": 19, "total_ranked": 28, "scoring_track": "minister", "criminal_cases_count": 2, "total_assets": 1418689.0, "education_myneta": "Graduate", "private_bills_count": 0, "committee_points": 0, "note": "This MLA is a Minister. Ministers represent the government in debates, so we do not report their participation. They do not sign the attendance register, ask questions, or introduce private member bills. Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": true}, {"name": "Veena George", "constituency": "Aranmula", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 49, "gender": "Female", "attendance_pct": null, "questions_asked": null, "participation_score": null, "accountability_score": null, "legislative_score": null, "probity_score": 82.9, "composite_score": 82.9, "grade": "A", "rank": 5, "total_ranked": 28, "scoring_track": "minister", "criminal_cases_count": 0, "total_assets": 0.0, "education_myneta": "", "private_bills_count": 0, "committee_points": 0, "note": "This MLA is a Minister. Ministers represent the government in debates, so we do not report their participation. They do not sign the attendance register, ask questions, or introduce private member bills. Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": true}, {"name": "Antony Raju", "constituency": "Thiruvananthapuram", "party": "Janadhipathiya Kerala Congress", "alliance": "Other", "age": 70, "gender": "Male", "attendance_pct": 93.1, "questions_asked": 68.0, "participation_score": null, "accountability_score": null, "legislative_score": null, "probity_score": 57.1, "composite_score": 57.1, "grade": "C", "rank": 14, "total_ranked": 28, "scoring_track": "minister", "criminal_cases_count": 1, "total_assets": 32554666.0, "education_myneta": "Graduate Professional", "private_bills_count": 0, "committee_points": 0, "note": "This MLA was a Minister till 24 December 2023. Ministers represent the government in debates, so we do not report their participation. They do not sign the attendance register, ask questions, or introduce private member bills. Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": true}, {"name": "V. Abdurahiman", "constituency": "Tanur", "party": "National Secular Conference", "alliance": "Other", "age": 63, "gender": "Male", "attendance_pct": null, "questions_asked": null, "participation_score": null, "accountability_score": null, "legislative_score": null, "probity_score": 82.9, "composite_score": 82.9, "grade": "A", "rank": 6, "total_ranked": 28, "scoring_track": "minister", "criminal_cases_count": 0, "total_assets": 171780192.0, "education_myneta": "10th Pass", "private_bills_count": 0, "committee_points": 0, "note": "This MLA is a Minister. Ministers represent the government in debates, so we do not report their participation. They do not sign the attendance register, ask questions, or introduce private member bills. Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": true}, {"name": "Chittayam Gopakumar", "constituency": "Adoor", "party": "Communist Party of India", "alliance": "Other", "age": 60, "gender": "Male", "attendance_pct": null, "questions_asked": null, "participation_score": null, "accountability_score": null, "legislative_score": null, "probity_score": 82.9, "composite_score": 82.9, "grade": "A", "rank": 7, "total_ranked": 28, "scoring_track": "minister", "criminal_cases_count": 0, "total_assets": 3121897.0, "education_myneta": "12th Pass", "private_bills_count": 0, "committee_points": 0, "note": "This MLA is the Deputy Speaker. We do not report their participation. Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": true}, {"name": "K. Krishnankutty", "constituency": "Chittur", "party": "Janata Dal (Secular)", "alliance": "LDF", "age": 81, "gender": "Male", "attendance_pct": null, "questions_asked": null, "participation_score": null, "accountability_score": null, "legislative_score": null, "probity_score": 82.9, "composite_score": 82.9, "grade": "A", "rank": 8, "total_ranked": 28, "scoring_track": "minister", "criminal_cases_count": 0, "total_assets": 31010907.0, "education_myneta": "8th Pass", "private_bills_count": 0, "committee_points": 0, "note": "This MLA is a Minister. Ministers represent the government in debates, so we do not report their participation. They do not sign the attendance register, ask questions, or introduce private member bills. Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": true}, {"name": "Pinarayi Vijayan", "constituency": "Dharmadam", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 82, "gender": "Male", "attendance_pct": null, "questions_asked": null, "participation_score": null, "accountability_score": null, "legislative_score": null, "probity_score": 44.3, "composite_score": 44.3, "grade": "D", "rank": 20, "total_ranked": 28, "scoring_track": "minister", "criminal_cases_count": 2, "total_assets": 11875766.0, "education_myneta": "12th Pass", "private_bills_count": 0, "committee_points": 0, "note": "This MLA is a Chief Minister. We do not report their participation. Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": true}, {"name": "Ramachandran Kadannappalli", "constituency": "Kannur", "party": "Congress (Secular)", "alliance": "Other", "age": 81, "gender": "Male", "attendance_pct": 98.1, "questions_asked": 384.0, "participation_score": null, "accountability_score": null, "legislative_score": null, "probity_score": 57.1, "composite_score": 57.1, "grade": "C", "rank": 15, "total_ranked": 28, "scoring_track": "minister", "criminal_cases_count": 1, "total_assets": 7593999.0, "education_myneta": "Graduate", "private_bills_count": 0, "committee_points": 0, "note": "This MLA has been a Minister from 29 December 2023. Ministers represent the government in debates, so we do not report their participation. They do not sign the attendance register, ask questions, or introduce private member bills. Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": true}, {"name": "K. N. Balagopal", "constituency": "Kottarakkara", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 61, "gender": "Male", "attendance_pct": null, "questions_asked": null, "participation_score": null, "accountability_score": null, "legislative_score": null, "probity_score": 57.1, "composite_score": 57.1, "grade": "C", "rank": 16, "total_ranked": 28, "scoring_track": "minister", "criminal_cases_count": 1, "total_assets": 9122865.0, "education_myneta": "Post Graduate", "private_bills_count": 0, "committee_points": 0, "note": "This MLA is a Minister. Ministers represent the government in debates, so we do not report their participation. They do not sign the attendance register, ask questions, or introduce private member bills. Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": true}, {"name": "N. Jayaraj", "constituency": "Kanjirappally", "party": "Kerala Congress (M)", "alliance": "Other", "age": 70, "gender": "Male", "attendance_pct": null, "questions_asked": 713.0, "participation_score": null, "accountability_score": null, "legislative_score": null, "probity_score": 82.9, "composite_score": 82.9, "grade": "A", "rank": 9, "total_ranked": 28, "scoring_track": "minister", "criminal_cases_count": 0, "total_assets": 26831036.0, "education_myneta": "Doctorate", "private_bills_count": 0, "committee_points": 0, "note": "This MLA is the Chief Whip. Ministers represent the government in debates, so we do not report their participation. They do not sign the attendance register. Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": true}, {"name": "A.K. Saseendran", "constituency": "Elathur", "party": "Nationalist Congress Party", "alliance": "LDF", "age": 80, "gender": "Male", "attendance_pct": null, "questions_asked": null, "participation_score": null, "accountability_score": null, "legislative_score": null, "probity_score": 82.9, "composite_score": 82.9, "grade": "A", "rank": 10, "total_ranked": 28, "scoring_track": "minister", "criminal_cases_count": 0, "total_assets": 20637386.0, "education_myneta": "10th Pass", "private_bills_count": 0, "committee_points": 0, "note": "This MLA is a Minister. Ministers represent the government in debates, so we do not report their participation. They do not sign the attendance register, ask questions, or introduce private member bills. Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": true}, {"name": "Roshy Augustine", "constituency": "Idukki", "party": "Kerala Congress (M)", "alliance": "Other", "age": 57, "gender": "Male", "attendance_pct": null, "questions_asked": null, "participation_score": null, "accountability_score": null, "legislative_score": null, "probity_score": 35.7, "composite_score": 35.7, "grade": "D", "rank": 22, "total_ranked": 28, "scoring_track": "minister", "criminal_cases_count": 3, "total_assets": 24784164.0, "education_myneta": "Graduate", "private_bills_count": 0, "committee_points": 0, "note": "This MLA is a Minister. Ministers represent the government in debates, so we do not report their participation. They do not sign the attendance register, ask questions, or introduce private member bills. Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": true}, {"name": "V. N. Vasavan", "constituency": "Ettumanoor", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 70, "gender": "Male", "attendance_pct": null, "questions_asked": null, "participation_score": null, "accountability_score": null, "legislative_score": null, "probity_score": 57.1, "composite_score": 57.1, "grade": "C", "rank": 17, "total_ranked": 28, "scoring_track": "minister", "criminal_cases_count": 1, "total_assets": 9463784.0, "education_myneta": "10th Pass", "private_bills_count": 0, "committee_points": 0, "note": "This MLA is a Minister. Ministers represent the government in debates, so we do not report their participation. They do not sign the attendance register, ask questions, or introduce private member bills. Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": true}, {"name": "R. Bindu", "constituency": "Irinjalakkuda", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 57, "gender": "Female", "attendance_pct": null, "questions_asked": null, "participation_score": null, "accountability_score": null, "legislative_score": null, "probity_score": 82.9, "composite_score": 82.9, "grade": "A", "rank": 11, "total_ranked": 28, "scoring_track": "minister", "criminal_cases_count": 0, "total_assets": 12224783.0, "education_myneta": "Doctorate", "private_bills_count": 0, "committee_points": 0, "note": "This MLA is a Minister. Ministers represent the government in debates, so we do not report their participation. They do not sign the attendance register, ask questions, or introduce private member bills. Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": true}, {"name": "P. Rajeeve", "constituency": "Kalamassery", "party": "Communist Party of India (Marxist)", "alliance": "Other", "age": 57, "gender": "Male", "attendance_pct": null, "questions_asked": null, "participation_score": null, "accountability_score": null, "legislative_score": null, "probity_score": 35.7, "composite_score": 35.7, "grade": "D", "rank": 23, "total_ranked": 28, "scoring_track": "minister", "criminal_cases_count": 3, "total_assets": 53349321.0, "education_myneta": "Graduate Professional", "private_bills_count": 0, "committee_points": 0, "note": "This MLA is a Minister. Ministers represent the government in debates, so we do not report their participation. They do not sign the attendance register, ask questions, or introduce private member bills. Data corresponds to the period from 01-06-2021 to 24-02-2026. ", "is_minister": true}];
+        const partyColors = {"CPI(M)": "#FF0000", "Communist Party Of India(Marxist)": "#FF0000", "CPI": "#FF4444", "Communist Party Of India": "#FF4444", "INC": "#00BFFF", "Indian National Congress": "#00BFFF", "IUML": "#006400", "Indian Union Muslim League": "#006400", "BJP": "#FF9933", "Bharatiya Janata Party": "#FF9933", "KC(M)": "#800080", "Kerala Congress": "#800080", "JD(S)": "#008000", "NCP": "#004080", "RSP": "#CC0000", "Revolutionary Socialist Party": "#CC0000", "Independent": "#808080", "IND": "#808080"};
+
+        function getScoreColor(score) {
+            if (score === null || score === undefined) return '#666';
+            if (score >= 80) return '#f0c040';
+            if (score >= 60) return '#4caf50';
+            if (score >= 40) return '#e67e22';
+            return '#e74c3c';
+        }
+
+        function gradeClass(grade) {
+            const map = {'A+': 'grade-A-plus', 'A': 'grade-A', 'B+': 'grade-B-plus',
+                         'B': 'grade-B', 'C': 'grade-C', 'D': 'grade-D'};
+            return map[grade] || 'grade-D';
+        }
+
+        function scoreBar(score) {
+            if (score === null || score === undefined) return '<span style="color:#666">N/A</span>';
+            const color = getScoreColor(score);
+            return `<div style="display:flex;align-items:center;gap:8px;">
+                <div class="score-bar" style="flex:1">
+                    <div class="score-bar-fill" style="width:${score}%;background:${color}"></div>
+                </div>
+                <span style="min-width:35px;text-align:right;font-weight:600;color:${color}">${score}</span>
+            </div>`;
+        }
+
+        // === REGULAR MLA TABLE ===
+        const table = new Tabulator("#mla-table", {
+            data: mlaData,
+            layout: "fitColumns",
+            responsiveLayout: "collapse",
+            pagination: true,
+            paginationSize: 25,
+            initialSort: [{column: "rank", dir: "asc"}],
+            columns: [
+                {title: "#", field: "rank", width: 55, hozAlign: "center", sorter: "number"},
+                {title: "MLA Name", field: "name", minWidth: 180,
+                    formatter: function(cell) { return `<strong>${cell.getValue()}</strong>`; }},
+                {title: "Constituency", field: "constituency", minWidth: 130},
+                {title: "Party", field: "party", minWidth: 100,
+                    formatter: function(cell) {
+                        const party = cell.getValue();
+                        const color = partyColors[party] || '#d4a017';
+                        return `<span class="party-badge" style="background:${color}20;color:${color};border:1px solid ${color}40">${party}</span>`;
+                    }},
+                {title: "Alliance", field: "alliance", width: 70, hozAlign: "center"},
+                {title: "Participation", field: "participation_score", width: 130,
+                    formatter: function(cell) { return scoreBar(cell.getValue()); }, sorter: "number",
+                    titleFormatter: function() { return '<span title="Attendance at Assembly sessions (30%)">Participation</span>'; }},
+                {title: "Accountability", field: "accountability_score", width: 130,
+                    formatter: function(cell) { return scoreBar(cell.getValue()); }, sorter: "number",
+                    titleFormatter: function() { return '<span title="Questions raised for oversight (35%)">Accountability</span>'; }},
+                {title: "Legislative", field: "legislative_score", width: 120,
+                    formatter: function(cell) { return scoreBar(cell.getValue()); }, sorter: "number",
+                    titleFormatter: function() { return '<span title="Bills introduced + committee roles (15%)">Legislative</span>'; }},
+                {title: "Probity", field: "probity_score", width: 120,
+                    formatter: function(cell) { return scoreBar(cell.getValue()); }, sorter: "number",
+                    titleFormatter: function() { return '<span title="Criminal record - fewer cases = higher score (20%)">Probity</span>'; }},
+                {title: "Composite", field: "composite_score", width: 110,
+                    formatter: function(cell) {
+                        const score = cell.getValue();
+                        if (score === null) return '<span style="color:#666">N/A</span>';
+                        const color = getScoreColor(score);
+                        return `<span style="font-size:1.2em;font-weight:700;color:${color}">${score}</span>`;
+                    }, sorter: "number"},
+                {title: "Grade", field: "grade", width: 70, hozAlign: "center",
+                    formatter: function(cell) {
+                        const grade = cell.getValue();
+                        return `<span class="grade-badge ${gradeClass(grade)}">${grade}</span>`;
+                    }},
+            ],
+        });
+
+        // === MINISTER TABLE ===
+        new Tabulator("#minister-table", {
+            data: ministerData,
+            layout: "fitColumns",
+            initialSort: [{column: "rank", dir: "asc"}],
+            columns: [
+                {title: "#", field: "rank", width: 55, hozAlign: "center", sorter: "number"},
+                {title: "Minister", field: "name", minWidth: 200,
+                    formatter: function(cell) { return `<strong>${cell.getValue()}</strong>`; }},
+                {title: "Constituency", field: "constituency", minWidth: 140},
+                {title: "Party", field: "party", minWidth: 100,
+                    formatter: function(cell) {
+                        const party = cell.getValue();
+                        const color = partyColors[party] || '#d4a017';
+                        return `<span class="party-badge" style="background:${color}20;color:${color};border:1px solid ${color}40">${party}</span>`;
+                    }},
+                {title: "Probity", field: "probity_score", width: 130,
+                    formatter: function(cell) { return scoreBar(cell.getValue()); }, sorter: "number"},
+                {title: "Composite", field: "composite_score", width: 120,
+                    formatter: function(cell) {
+                        const score = cell.getValue();
+                        if (score === null) return '<span style="color:#666">N/A</span>';
+                        const color = getScoreColor(score);
+                        return `<span style="font-size:1.2em;font-weight:700;color:${color}">${score}</span>`;
+                    }, sorter: "number"},
+                {title: "Grade", field: "grade", width: 70, hozAlign: "center",
+                    formatter: function(cell) {
+                        const grade = cell.getValue();
+                        return `<span class="grade-badge ${gradeClass(grade)}">${grade}</span>`;
+                    }},
+            ],
+        });
+
+        // === FILTERS ===
+        document.getElementById("nameSearch").addEventListener("input", function() {
+            table.setFilter("name", "like", this.value);
+        });
+        document.getElementById("partyFilter").addEventListener("change", function() {
+            if (this.value) table.setFilter("party", "=", this.value);
+            else table.clearFilter(true);
+        });
+        document.getElementById("allianceFilter").addEventListener("change", function() {
+            if (this.value) table.setFilter("alliance", "=", this.value);
+            else table.clearFilter(true);
+        });
+        document.getElementById("gradeFilter").addEventListener("change", function() {
+            if (this.value) table.setFilter("grade", "=", this.value);
+            else table.clearFilter(true);
+        });
+
+        // === CHARTS ===
+        const gradeDistribution = {"A+": 0, "A": 12, "B+": 6, "B": 24, "C": 31, "D": 67};
+        const partyScores = {"Indian Union Muslim League": 59.4, "Kerala Congress (M)": 58.4, "Communist Party of India (Marxist)": 49.9, "Communist Party of India": 46.0, "Indian National Congress": 45.4, "Independent": 38.4};
+        const scatterData = [{"x": 83.3, "y": 124, "name": "Aryadan Shoukath", "composite": 19.9}, {"x": 8.3, "y": 128, "name": "Rahul Mamkootathil", "composite": 25.0}, {"x": 89.1, "y": 164, "name": "U R Pradeep", "composite": 27.9}, {"x": 76.1, "y": 436, "name": "Chandy Oommen", "composite": 17.3}, {"x": 87.5, "y": 714, "name": "Uma Thomas", "composite": 38.3}, {"x": 93.8, "y": 762, "name": "E. K. Vijayan", "composite": 51.1}, {"x": 88.5, "y": 806, "name": "K. Babu", "composite": 27.1}, {"x": 97.9, "y": 808, "name": "K. Ansalan", "composite": 53.0}, {"x": 91.7, "y": 1139, "name": "A. P. Anilkumar", "composite": 60.8}, {"x": 95.8, "y": 1198, "name": "Mathew Kuzhalnadan", "composite": 69.5}, {"x": 84.4, "y": 761, "name": "Mani C. Kappen", "composite": 22.3}, {"x": 90.1, "y": 891, "name": "C. K . Hareendran", "composite": 48.3}, {"x": 90.1, "y": 781, "name": "Muhammed Muhassin", "composite": 44.7}, {"x": 97.9, "y": 837, "name": "K. Premkumar", "composite": 52.7}, {"x": 96.9, "y": 1141, "name": "M. S. Arun Kumar", "composite": 66.1}, {"x": 91.1, "y": 1024, "name": "T. P. Ramakrishnan", "composite": 52.1}, {"x": 77.1, "y": 742, "name": "K. K. Shailaja Teacher", "composite": 22.9}, {"x": 81.5, "y": 829, "name": "P. T. A. Rahim", "composite": 39.6}, {"x": 91.7, "y": 855, "name": "A. C. Moideen", "composite": 44.9}, {"x": 92.2, "y": 938, "name": "P. V. Sreenijin", "composite": 54.7}, {"x": 91.7, "y": 372, "name": "Kovoor Kunjumon", "composite": 37.9}, {"x": 94.8, "y": 871, "name": "K. P. Mohanan", "composite": 57.0}, {"x": 94.3, "y": 956, "name": "Thomas K Thomas", "composite": 60.0}, {"x": 95.3, "y": 1094, "name": "K. P. Kunhammed Kutti Master", "composite": 72.4}, {"x": 92.7, "y": 749, "name": "A. Prabhakaran", "composite": 47.8}, {"x": 99.5, "y": 1134, "name": "P. Ubaidulla", "composite": 77.9}, {"x": 85.9, "y": 941, "name": "Murali", "composite": 34.9}, {"x": 87.0, "y": 1104, "name": "U.A. Latheef", "composite": 49.5}, {"x": 94.8, "y": 1199, "name": "A. K. M. Ashraf", "composite": 68.0}, {"x": 87.0, "y": 1151, "name": "Manjalamkuzhi Ali", "composite": 60.2}, {"x": 95.8, "y": 1141, "name": "N. Samsudheen", "composite": 66.8}, {"x": 93.8, "y": 1019, "name": "T. I. Madhusoodanan", "composite": 52.6}, {"x": 94.8, "y": 939, "name": "Najeeb Kanthapuram", "composite": 43.7}, {"x": 91.7, "y": 1029, "name": "Sunny Joseph", "composite": 58.8}, {"x": 96.4, "y": 1153, "name": "K. K. Rema", "composite": 71.0}, {"x": 96.9, "y": 1023, "name": "Kurukkoli Moideen", "composite": 69.8}, {"x": 93.2, "y": 1067, "name": "K. P. A. Majeed", "composite": 64.6}, {"x": 93.2, "y": 1191, "name": "M. Rajagopalan", "composite": 61.7}, {"x": 94.3, "y": 1039, "name": "C. H. Kunhambu", "composite": 52.4}, {"x": 88.5, "y": 671, "name": "M. M. Mani", "composite": 34.2}, {"x": 88.5, "y": 442, "name": "C. K. Asha", "composite": 34.4}, {"x": 97.9, "y": 1151, "name": "Abdul Hameed Master", "composite": 69.5}, {"x": 98.4, "y": 1232, "name": "D. K. Murali", "composite": 75.4}, {"x": 97.4, "y": 1133, "name": "V. Joy", "composite": 72.6}, {"x": 99.5, "y": 510, "name": "V. K. Prasanth", "composite": 46.5}, {"x": 81.2, "y": 74, "name": "P. K. Kunhalikutty", "composite": 14.9}, {"x": 93.5, "y": 1046, "name": "K. N. Unnikrishnan", "composite": 58.8}, {"x": 92.2, "y": 451, "name": "P. Balachandran", "composite": 25.3}, {"x": 90.1, "y": 1081, "name": "K. Babu (Thripunithura)", "composite": 44.6}, {"x": 50.0, "y": 407, "name": "P. J. Joseph", "composite": 19.4}, {"x": 96.9, "y": 959, "name": "Linto Joseph", "composite": 56.0}, {"x": 95.8, "y": 409, "name": "Mathew T. Thomas", "composite": 48.9}, {"x": 90.6, "y": 497, "name": "K. T. Jaleel", "composite": 33.9}, {"x": 80.7, "y": 1011, "name": "I. C. Balakrishnan", "composite": 33.3}, {"x": 89.6, "y": 860, "name": "P. Mammikutty", "composite": 46.5}, {"x": 95.3, "y": 481, "name": "Pramod Narayan", "composite": 49.0}, {"x": 96.9, "y": 906, "name": "K. K. Ramachandran", "composite": 53.6}, {"x": 97.4, "y": 640, "name": "P. S. Supal", "composite": 45.2}, {"x": 97.9, "y": 975, "name": "Sebastian Kulathunkal", "composite": 64.8}, {"x": 87.0, "y": 556, "name": "P. Nandakumar", "composite": 34.4}, {"x": 92.2, "y": 1074, "name": "Anoop Jacob", "composite": 49.9}, {"x": 91.7, "y": 1073, "name": "Eldose P Kunnapillil", "composite": 52.8}, {"x": 85.4, "y": 1203, "name": "P.C. Vishnunadh", "composite": 48.8}, {"x": 94.8, "y": 761, "name": "Thottathil Ravindran", "composite": 52.8}, {"x": 89.1, "y": 885, "name": "Daleema", "composite": 47.0}, {"x": 95.3, "y": 884, "name": "G. Steephen", "composite": 59.9}, {"x": 96.4, "y": 904, "name": "O. S. Ambika", "composite": 63.1}, {"x": 97.9, "y": 880, "name": "K. V. Sumesh", "composite": 57.6}, {"x": 99.0, "y": 1001, "name": "K. M. Sachindev", "composite": 60.7}, {"x": 92.7, "y": 1063, "name": "Saneeshkumar Joseph", "composite": 48.6}, {"x": 77.1, "y": 1095, "name": "Roji M. John", "composite": 53.6}, {"x": 97.9, "y": 993, "name": "Job Maichil", "composite": 61.5}, {"x": 96.4, "y": 780, "name": "G. S. Jayalal", "composite": 48.4}, {"x": 98.4, "y": 566, "name": "Sujith Vijayanpillai", "composite": 58.3}, {"x": 97.9, "y": 659, "name": "V. Sasi", "composite": 53.6}, {"x": 88.5, "y": 951, "name": "H. Salam", "composite": 35.8}, {"x": 91.7, "y": 647, "name": "A. Raja", "composite": 39.0}, {"x": 95.2, "y": 737, "name": "Kanathil Jameela", "composite": 47.8}, {"x": 82.8, "y": 380, "name": "C. C. Mukundhan", "composite": 29.2}, {"x": 97.9, "y": 1149, "name": "M. Vincent", "composite": 66.8}, {"x": 93.5, "y": 373, "name": "Vazhoor Soman", "composite": 41.5}, {"x": 94.8, "y": 1095, "name": "Anwar Sadath", "composite": 54.4}, {"x": 94.8, "y": 824, "name": "P. P. Sumod", "composite": 43.1}, {"x": 94.3, "y": 1044, "name": "P. P. Chitharanjan", "composite": 51.1}, {"x": 95.3, "y": 1089, "name": "K. D. Prasenan", "composite": 72.1}, {"x": 87.5, "y": 1049, "name": "Thiruvanchoor Radhakrishnan", "composite": 48.8}, {"x": 54.2, "y": 955, "name": "M. K. Muneer", "composite": 28.2}, {"x": 90.1, "y": 1196, "name": "N. A. Nellikkunnu", "composite": 66.0}, {"x": 93.2, "y": 842, "name": "I. B. Satheesh", "composite": 39.2}, {"x": 95.3, "y": 814, "name": "U. Prathibha", "composite": 57.1}, {"x": 89.1, "y": 491, "name": "Kadakampally Surendran", "composite": 20.3}, {"x": 94.8, "y": 1033, "name": "K. J. Maxy", "composite": 60.2}, {"x": 99.4, "y": 629, "name": "V. R. Sunilkumar", "composite": 60.5}, {"x": 93.2, "y": 581, "name": "M. Mukesh", "composite": 40.1}, {"x": 98.4, "y": 1321, "name": "T. V. Ibrahim", "composite": 81.9}, {"x": 90.6, "y": 987, "name": "Santhakumari K.", "composite": 54.4}, {"x": 99.0, "y": 518, "name": "K.U. Jenish Kumar", "composite": 45.2}, {"x": 88.3, "y": 900, "name": "Antony John", "composite": 46.2}, {"x": 91.1, "y": 1239, "name": "Abid Hussain Thangal", "composite": 61.8}, {"x": 87.0, "y": 1138, "name": "C. R. Mahesh", "composite": 44.0}, {"x": 91.1, "y": 1221, "name": "P. K. Basheer", "composite": 68.9}, {"x": 95.3, "y": 1058, "name": "T. J. Vinod", "composite": 53.1}, {"x": 90.1, "y": 620, "name": "M. Noushad", "composite": 29.0}, {"x": 97.9, "y": 906, "name": "N. K. Akbar", "composite": 62.2}, {"x": 78.1, "y": 339, "name": "Ramesh Chennithala", "composite": 14.0}, {"x": 94.9, "y": 1043, "name": "Sajeev Joseph", "composite": 59.4}, {"x": 96.9, "y": 1001, "name": "E. Chandrashekaran", "composite": 68.7}, {"x": 88.0, "y": 1083, "name": "Mons Joseph", "composite": 49.1}, {"x": 98.4, "y": 646, "name": "E. T. Taison Master", "composite": 48.9}, {"x": 97.4, "y": 1147, "name": "M. Vijin", "composite": 64.9}, {"x": 90.1, "y": 1063, "name": "T. Siddiqu", "composite": 42.6}, {"x": 93.8, "y": 980, "name": "Xavier Chittilappilly", "composite": 45.4}];
+        const allianceScores = {"UDF": {"participation": 39.7, "accountability": 67.9, "legislative": 50.0, "probity": 40.2}, "Other": {"participation": 54.7, "accountability": 41.4, "legislative": 50.0, "probity": 51.1}, "LDF": {"participation": 63.6, "accountability": 34.7, "legislative": 50.0, "probity": 82.9}};
+
+        const goldPalette = ['#ffd74a', '#f0c040', '#d4a017', '#b8860b', '#8b6914', '#5c4a0e'];
+
+        new Chart(document.getElementById('gradeChart'), {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(gradeDistribution),
+                datasets: [{
+                    data: Object.values(gradeDistribution),
+                    backgroundColor: goldPalette,
+                    borderWidth: 0,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { position: 'right', labels: { color: '#b0a880' } } }
+            }
+        });
+
+        new Chart(document.getElementById('partyChart'), {
+            type: 'bar',
+            data: {
+                labels: Object.keys(partyScores),
+                datasets: [{
+                    label: 'Avg Composite Score',
+                    data: Object.values(partyScores),
+                    backgroundColor: Object.keys(partyScores).map(p => (partyColors[p] || '#d4a017') + '99'),
+                    borderColor: Object.keys(partyScores).map(p => partyColors[p] || '#d4a017'),
+                    borderWidth: 1,
+                }]
+            },
+            options: {
+                responsive: true,
+                indexAxis: 'y',
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { min: 0, max: 100, ticks: { color: '#b0a880' }, grid: { color: '#3d3518' } },
+                    y: { ticks: { color: '#b0a880' }, grid: { display: false } }
+                }
+            }
+        });
+
+        new Chart(document.getElementById('scatterChart'), {
+            type: 'scatter',
+            data: {
+                datasets: [{
+                    label: 'MLAs',
+                    data: scatterData,
+                    backgroundColor: scatterData.map(d => getScoreColor(d.composite) + '88'),
+                    pointRadius: 5,
+                    pointHoverRadius: 8,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(ctx) {
+                                const d = ctx.raw;
+                                return `${d.name}: Att ${d.x}%, Q ${d.y}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: { title: { display: true, text: 'Attendance %', color: '#b0a880' },
+                          ticks: { color: '#b0a880' }, grid: { color: '#3d3518' } },
+                    y: { title: { display: true, text: 'Questions Asked', color: '#b0a880' },
+                          ticks: { color: '#b0a880' }, grid: { color: '#3d3518' } }
+                }
+            }
+        });
+
+        new Chart(document.getElementById('allianceChart'), {
+            type: 'radar',
+            data: {
+                labels: ['Participation', 'Accountability', 'Legislative', 'Probity'],
+                datasets: Object.keys(allianceScores).map((alliance, i) => ({
+                    label: alliance,
+                    data: [
+                        allianceScores[alliance].participation || 0,
+                        allianceScores[alliance].accountability || 0,
+                        allianceScores[alliance].legislative || 0,
+                        allianceScores[alliance].probity || 0,
+                    ],
+                    borderColor: ['#e74c3c', '#3498db', '#9b59b6'][i] || '#d4a017',
+                    backgroundColor: (['#e74c3c22', '#3498db22', '#9b59b622'])[i] || '#d4a01722',
+                    borderWidth: 2,
+                    pointRadius: 3,
+                }))
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    r: {
+                        min: 0, max: 100,
+                        ticks: { color: '#b0a880', backdropColor: 'transparent' },
+                        grid: { color: '#3d3518' },
+                        pointLabels: { color: '#b0a880' },
+                    }
+                },
+                plugins: { legend: { labels: { color: '#b0a880' } } }
+            }
+        });
+    </script>
+</body>
+</html>
